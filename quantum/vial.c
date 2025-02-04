@@ -489,6 +489,7 @@ static void reload_tap_dance(void) {
 #endif
 
 #ifdef TAPPING_TERM_PER_KEY
+#ifdef VIAL_TAPPING_TERM_PER_KEY
 uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
 #ifdef VIAL_TAP_DANCE_ENABLE
     if (keycode >= QK_TAP_DANCE && keycode <= QK_TAP_DANCE_MAX) {
@@ -503,6 +504,7 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
     return TAPPING_TERM;
 #endif
 }
+#endif
 
 uint16_t tap_dance_count(void) {
     return VIAL_TAP_DANCE_ENTRIES;
