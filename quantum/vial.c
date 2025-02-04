@@ -508,11 +508,13 @@ uint16_t tap_dance_count(void) {
     return VIAL_TAP_DANCE_ENTRIES;
 }
 
+#ifdef VIAL_TAP_DANCE_ENABLE
 tap_dance_action_t* tap_dance_get(uint16_t tap_dance_idx) {
     if (tap_dance_idx >= VIAL_TAP_DANCE_ENTRIES)
         return NULL;
     return &tap_dance_actions[tap_dance_idx];
 }
+#endif
 #endif
 
 #ifdef VIAL_COMBO_ENABLE
