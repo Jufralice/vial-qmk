@@ -74,7 +74,7 @@ void vial_keycode_tap(uint16_t keycode);
 
 
 #ifdef TAP_DANCE_ENABLE
-#define VIAL_TAP_DANCE_ENABLE
+/* #define VIAL_TAP_DANCE_ENABLE */
 
 #ifndef VIAL_TAP_DANCE_ENTRIES
     #if TOTAL_EEPROM_BYTE_COUNT > 4000
