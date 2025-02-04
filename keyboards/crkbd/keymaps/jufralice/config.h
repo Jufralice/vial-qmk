@@ -1,0 +1,26 @@
+#pragma once
+
+#define VIAL_KEYBOARD_UID {0x89, 0x36, 0x2A, 0xC7, 0xFA, 0xD8, 0x89, 0x45}
+#define VIAL_UNLOCK_COMBO_ROWS {0, 0}
+#define VIAL_UNLOCK_COMBO_COLS {0, 1}
+#define TAPPING_TERM 200
+// #define TAPPING_TERM_PER_KEY
+// #define VIAL_TAPPING_TERM_PER_KEY
+/* #define HOLD_ON_OTHER_KEY_PRESS false */
+/* #define HOLD_ON_OTHER_KEY_PRESS_PER_KEY */
+#define PERMISSIVE_HOLD false
+#define MAX_DEFERRED_EXECUTORS 10
+#define TAPPING_TOGGLE 2
+
+/* for the sm_td library */
+// https://github.com/stasmarkin/sm_td
+// #define SMTD_GLOBAL_TAP_TERM 400
+// #define SMTD_GLOBAL_FOLLOWING_TAP_TERM 400
+#define SMTD_GLOBAL_TAP_TERM 200
+#define SMTD_GLOBAL_FOLLOWING_TAP_TERM 200
+#define SMTD_GLOBAL_SEQUENCE_TERM 150
+#define SMTD_GLOBAL_RELEASE_TERM 20
+// #define SMTD_DEBUG_ENABLED
+
+#define DYNAMIC_KEYMAP_LAYER_COUNT 10
+
