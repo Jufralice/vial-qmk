@@ -749,7 +749,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+-----------+--------+----------|  |--------+-----------+-----------+--------+--------+----------+-----------|
       _______,   CKC_1,   CKC_2,   CKC_3,      CKC_4,    KC_5,   XXXXXXX,    XXXXXXX,       KC_6,      CKC_7,   CKC_8,   CKC_9,     CKC_0, TD(TD_CLN),
   //|--------+--------+--------+--------+-----------+--------+----------'  `--------+-----------+-----------+--------+--------+----------+-----------|
-      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX,                           XXXXXXX,    XXXXXXX, XXXXXXX,  KC_DOT,   XXXXXXX,    XXXXXXX,
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX,                           XXXXXXX,    XXXXXXX, XXXXXXX,  KC_DOT,   XXXXXXX, CKC_ENTER3,
   //|--------+--------+--------+--------+-----------+--------+----------.  ,--------+-----------+-----------+--------+--------+----------+-----------|
                                               KC_TAB,KC_SPACE,CKC_ENTER3,    _______,    XXXXXXX,     XXXXXXX
                                         //`-----------------------------'  `--------------------------------'
@@ -762,7 +762,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------+--------|  |----------+----------+-----------+----------+------------+--------+--------|
       _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX,   KC_LEFT,   CKC_DOWN,    CKC_UP,   CKC_RIGHT, CKC_ENT, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------'  `----------+----------+-----------+----------+------------+--------+--------|
-      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                          XXXXXXX,      DF(LWIN1),   XXXXXXX,     XXXXXXX, XXXXXXX, KC_TILD,
+   CKC_SPACE3, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                          XXXXXXX,      DF(LWIN1),   XXXXXXX,     XXXXXXX, XXXXXXX, KC_TILD,
   //|--------+--------+--------+--------+--------+--------+--------.  ,----------+----------+-----------+----------+------------+--------+--------|
                                           XXXXXXX, XXXXXXX, _______,   CKC_SPACE3,   KC_BSPC, XXXXXXX
                                       //`--------------------------'  `----------------------------'
