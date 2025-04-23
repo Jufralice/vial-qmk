@@ -1,4 +1,5 @@
 #include QMK_KEYBOARD_H
+#include <stdio.h> // Include for printf
 /* #include "keymap_us_international.h" */
 /* #include "sendstring_us_international.h" */
 
@@ -20,14 +21,12 @@
 /* #define LY3BS LT(3, KC_BSPC) */
 /* #define LY3T LT(4, KC_TAB) */
 #define LBASE 0
-#define LHUB 1
-#define LNUM 2
-#define LARROW 3
-#define LBOOT 4
-#define LPART 5
-#define LWIN1 6
-#define LWIN2 7
-#define LVIMNAV 8
+#define LNUM 1
+#define LARROW 2
+#define LBOOT 3
+#define LPART 4
+#define LWIN1 5
+#define LVIMNAV 6
 #define LVIMMOV 9
 
 
@@ -85,9 +84,6 @@ enum tap_dances {
     // for vim shortcuts
     TD_YC,
     TD_FF,
-    // apparently this TD_COUNT is needed to avoid the last tap dance to be skipped
-    TD_COUNT,
-    // end
 };
 
 enum custom_keycodes {
@@ -100,7 +96,43 @@ enum custom_keycodes {
     SS_WSU, //Window size increase
     SS_WSD, //Window size decrease
     SS_GG, //GG for move line number
-// --- For tap dances ---
+// --- For sm_td ---
+// https://github.com/stasmarkin/sm_td
+
+    SMTD_KEYCODES_BEGIN,
+    CKC_A, // reads as C(ustom) + KC_A, but you may give any name here
+    CKC_S,
+    CKC_D,
+    CKC_F,
+    CKC_J,
+    CKC_K,
+    CKC_L,
+    CKC_UNDS,
+    CKC_1,
+    CKC_2,
+    CKC_3,
+    CKC_4,
+    CKC_7,
+    CKC_8,
+    CKC_9,
+    CKC_0,
+    CKC_DOWN,
+    CKC_UP,
+    CKC_RIGHT,
+    CKC_ENT,
+    CKC_ENT_GUI,
+    CKC_STAB,
+    CKC_SPACE,
+    CKC_ENTER,
+    CKC_SPACE3,
+    CKC_ENTER3,
+    CKC_TAB,
+    CKC_VIMNAV,
+    SMTD_KEYCODES_END,
+    DBG_ENUM, // Add a keycode to trigger debug print
+};
+
+enum tapdances_keycodes {
     V_ESC = TD(TD_V_ESC),
     A_ESC = TD(TD_A_ESC),
     CLN = TD(TD_CLN),
@@ -137,38 +169,6 @@ enum custom_keycodes {
 // --- For vim shortcuts ---
     FF = TD(TD_FF), // Telescope find files
     YC = TD(TD_YC), // Yank to clipboard or a buffer
-// --- For sm_td ---
-// https://github.com/stasmarkin/sm_td
-    SMTD_KEYCODES_BEGIN,
-    CKC_A, // reads as C(ustom) + KC_A, but you may give any name here
-    CKC_S,
-    CKC_D,
-    CKC_F,
-    CKC_J,
-    CKC_K,
-    CKC_L,
-    CKC_UNDS,
-    CKC_1,
-    CKC_2,
-    CKC_3,
-    CKC_4,
-    CKC_7,
-    CKC_8,
-    CKC_9,
-    CKC_0,
-    CKC_DOWN,
-    CKC_UP,
-    CKC_RIGHT,
-    CKC_ENT,
-    CKC_ENT_GUI,
-    CKC_STAB,
-    CKC_SPACE,
-    CKC_ENTER,
-    CKC_SPACE3,
-    CKC_ENTER3,
-    CKC_TAB,
-    CKC_VIMNAV,
-    SMTD_KEYCODES_END,
 };
 
 
@@ -893,6 +893,133 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                   tap_code16(tap_hold->tap);
               }
               break;
+        // -- Debug Print Case ---
+        case DBG_ENUM:
+             // to see these outputs, set the CONSOLE_ENABLE and COMMAND_ENABLE to 'yes' in rules.mk
+             // then start the qmk console with > qmk console
+            if (record->event.pressed) {
+                printf("--- Custom Keycode Values ---\n");
+                printf("BEGIN: %d\n", BEGIN);
+                printf("SS_WL: %d\n", SS_WL);
+                printf("SS_WR: %d\n", SS_WR);
+                printf("SS_WU: %d\n", SS_WU);
+                printf("SS_WD: %d\n", SS_WD);
+                printf("SS_WSU: %d\n", SS_WSU);
+                printf("SS_WSD: %d\n", SS_WSD);
+                printf("SS_GG: %d\n", SS_GG);
+                printf("V_ESC: %d\n", V_ESC);
+                printf("A_ESC: %d\n", A_ESC);
+                printf("CLN: %d\n", CLN);
+                printf("EQL: %d\n", EQL);
+                printf("BSPC: %d\n", BSPC);
+                printf("QUOT: %d\n", QUOT);
+                printf("COLN: %d\n", COLN);
+                printf("SLSH: %d\n", SLSH);
+                printf("LPRN: %d\n", LPRN);
+                printf("RPRN: %d\n", RPRN);
+                printf("LBRC: %d\n", LBRC);
+                printf("AMPR: %d\n", AMPR);
+                printf("DLR: %d\n", DLR);
+                printf("AT: %d\n", AT);
+                printf("CIRC: %d\n", CIRC);
+                printf("COM: %d\n", COM);
+                printf("DOT: %d\n", DOT);
+                printf("WRS1: %d\n", WRS1);
+                printf("WRS2: %d\n", WRS2);
+                printf("WRS3: %d\n", WRS3);
+                printf("WRS4: %d\n", WRS4);
+                printf("WRS5: %d\n", WRS5);
+                printf("WRS6: %d\n", WRS6);
+                printf("WRS7: %d\n", WRS7);
+                printf("WRS8: %d\n", WRS8);
+                printf("WRS9: %d\n", WRS9);
+                printf("WND: %d\n", WND);
+                printf("WSW: %d\n", WSW);
+                printf("SD1: %d\n", SD1);
+                printf("SU1: %d\n", SU1);
+                printf("ZZ: %d\n", ZZ);
+                printf("FF: %d\n", FF);
+                printf("YC: %d\n", YC);
+                printf("SMTD_KEYCODES_BEGIN: %d\n", SMTD_KEYCODES_BEGIN);
+                printf("CKC_A: %d\n", CKC_A);
+                printf("CKC_S: %d\n", CKC_S);
+                printf("CKC_D: %d\n", CKC_D);
+                printf("CKC_F: %d\n", CKC_F);
+                printf("CKC_J: %d\n", CKC_J);
+                printf("CKC_K: %d\n", CKC_K);
+                printf("CKC_L: %d\n", CKC_L);
+                printf("CKC_UNDS: %d\n", CKC_UNDS);
+                printf("CKC_1: %d\n", CKC_1);
+                printf("CKC_2: %d\n", CKC_2);
+                printf("CKC_3: %d\n", CKC_3);
+                printf("CKC_4: %d\n", CKC_4);
+                printf("CKC_7: %d\n", CKC_7);
+                printf("CKC_8: %d\n", CKC_8);
+                printf("CKC_9: %d\n", CKC_9);
+                printf("CKC_0: %d\n", CKC_0);
+                printf("CKC_DOWN: %d\n", CKC_DOWN);
+                printf("CKC_UP: %d\n", CKC_UP);
+                printf("CKC_RIGHT: %d\n", CKC_RIGHT);
+                printf("CKC_ENT: %d\n", CKC_ENT);
+                printf("CKC_ENT_GUI: %d\n", CKC_ENT_GUI);
+                printf("CKC_STAB: %d\n", CKC_STAB);
+                printf("CKC_SPACE: %d\n", CKC_SPACE);
+                printf("CKC_ENTER: %d\n", CKC_ENTER);
+                printf("CKC_SPACE3: %d\n", CKC_SPACE3);
+                printf("CKC_ENTER3: %d\n", CKC_ENTER3);
+                printf("CKC_TAB: %d\n", CKC_TAB);
+                printf("CKC_VIMNAV: %d\n", CKC_VIMNAV);
+                printf("SMTD_KEYCODES_END: %d\n", SMTD_KEYCODES_END);
+                printf("DBG_ENUM: %d\n", DBG_ENUM);
+                printf("-----------------------------\n");
+                printf("--- Tap Dance Enum Values ---\n");
+                printf("TD_V_ESC: %d\n", TD_V_ESC);
+                printf("TD_A_ESC: %d\n", TD_A_ESC);
+                printf("TD_CLN: %d\n", TD_CLN);
+                printf("TD_EQL: %d\n", TD_EQL);
+                printf("TD_BSPC: %d\n", TD_BSPC);
+                printf("TD_QUOT: %d\n", TD_QUOT);
+                printf("TD_COLN: %d\n", TD_COLN);
+                printf("TD_SLSH: %d\n", TD_SLSH);
+                printf("TD_LPRN: %d\n", TD_LPRN);
+                printf("TD_RPRN: %d\n", TD_RPRN);
+                printf("TD_LBRC: %d\n", TD_LBRC);
+                printf("TD_AMPR: %d\n", TD_AMPR);
+                printf("TD_DLR: %d\n", TD_DLR);
+                printf("TD_AT: %d\n", TD_AT);
+                printf("TD_CIRC: %d\n", TD_CIRC);
+                printf("TD_COM: %d\n", TD_COM);
+                printf("TD_DOT: %d\n", TD_DOT);
+                printf("TD_WRS1: %d\n", TD_WRS1);
+                printf("TD_WRS2: %d\n", TD_WRS2);
+                printf("TD_WRS3: %d\n", TD_WRS3);
+                printf("TD_WRS4: %d\n", TD_WRS4);
+                printf("TD_WRS5: %d\n", TD_WRS5);
+                printf("TD_WRS6: %d\n", TD_WRS6);
+                printf("TD_WRS7: %d\n", TD_WRS7);
+                printf("TD_WRS8: %d\n", TD_WRS8);
+                printf("TD_WRS9: %d\n", TD_WRS9);
+                printf("TD_WND: %d\n", TD_WND);
+                printf("TD_WSW: %d\n", TD_WSW);
+                printf("TD_SD1: %d\n", TD_SD1);
+                printf("TD_SU1: %d\n", TD_SU1);
+                printf("TD_ZZ: %d\n", TD_ZZ);
+                printf("TD_FF: %d\n", TD_FF);
+                printf("TD_YC: %d\n", TD_YC);
+                printf("-----------------------------\n");
+                printf("QK_TAP_DANCE: %d\n", QK_TAP_DANCE);
+                printf("QK_TAP_DANCE_MAX: %d\n", QK_TAP_DANCE_MAX);
+
+                printf("--- some other keycodes# ---\n");
+                printf("KC_1: %d\n", KC_1);
+                printf("KC_2: %d\n", KC_2);
+                printf("KC_A: %d\n", KC_A);
+                printf("KC_DOWN: %d\n", KC_DOWN);
+                printf("S(KC_TAB): %d\n", S(KC_TAB));
+                printf("LCAG(KC_DOWN): %d\n", LCAG(KC_DOWN));
+                printf("VIAL_TAP_DANCE_ENTRIES: %d\n", VIAL_TAP_DANCE_ENTRIES);
+            }
+            return true; // Consume the keycode
     }
     return true;
 }
@@ -945,7 +1072,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // Boot, flash and led layer (two thumbs1)
   [LBOOT] = LAYOUT_split_3x6_3_ex2(
   //,--------------------------------------------------------------.  ,--------------------------------------------------------------.
-      QK_BOOT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, DT_PRNT, QK_BOOT,
+      QK_BOOT, DBG_ENUM, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, DT_PRNT, QK_BOOT,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
       RGB_TOG, RGB_HUI, RGB_SAI, RGB_VAI, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, DT_UP, RGB_TOG,
   //|--------+--------+--------+--------+--------+--------+--------'  `--------+--------+--------+--------+--------+--------+--------|
@@ -967,18 +1094,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                       //`--------------------------'  `------------------------------'
   ),
   // Window management layer (new base layer)
-  [LHUB] = LAYOUT_split_3x6_3_ex2(
-  //,---------------------------------------------------------------------.  ,-----------------------------------------------------------------.
-      XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX,       XXXXXXX, KC_U, KC_I, KC_J,   KC_K, XXXXXXX, XXXXXXX,
-  //|--------+--------+--------+------------+--------+--------+-----------|  |-----------+--------+--------+--------+--------+--------+--------|
-      XXXXXXX, XXXXXXX, XXXXXXX,  TG(LWIN2),TG(LWIN1), XXXXXXX,    XXXXXXX,       XXXXXXX, KC_LEFT,  KC_DOWN, KC_UP, KC_RIGHT,  KC_C, XXXXXXX,
-  //|--------+--------+--------+------------+--------+--------+-----------'  `-----------+--------+--------+--------+--------+--------+--------|
-      XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX, XXXXXXX, XXXXXXX,                            XXXXXXX,  DF(LBASE), XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  //|--------+--------+--------+------------+--------+--------+-----------.  ,-----------+--------+--------+--------+--------+--------+--------|
-                                              XXXXXXX, XXXXXXX,    XXXXXXX,       XXXXXXX, XXXXXXX,  XXXXXXX
-                                          //`-----------------------------'  `-----------------------------'
-  ),
-  // Window management layer (new base layer)
   [LWIN1] = LAYOUT_split_3x6_3_ex2(
   //,-----------------------------------------------------------------------------------.  ,-----------------------------------------------------------------.
       XXXXXXX, XXXXXXX,       XXXXXXX,    LCAG(KC_UP),          WND, XXXXXXX,    XXXXXXX,       XXXXXXX, XXXXXXX,    WRS1,    WRS2,    WRS3, XXXXXXX, XXXXXXX,
@@ -989,18 +1104,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------------+---------------+-------------+--------+-----------.  ,-----------+--------+--------+--------+--------+--------+--------|
                                                           XXXXXXX,  XXXXXXX,  DF(LBASE),        CKC_STAB, XXXXXXX,  XXXXXXX
                                                       //`-----------------------------'  `-----------------------------'
-  ),
-  // Window management layer (new base layer)
-  [LWIN2] = LAYOUT_split_3x6_3_ex2(
-  //,---------------------------------------------------------------------.  ,-----------------------------------------------------------------.
-      XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX,       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,   XXXXXXX, XXXXXXX, XXXXXXX,
-  //|--------+--------+--------+------------+--------+--------+-----------|  |-----------+--------+--------+--------+--------+--------+--------|
-      XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX,       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  XXXXXXX, XXXXXXX,
-  //|--------+--------+--------+------------+--------+--------+-----------'  `-----------+--------+--------+--------+--------+--------+--------|
-      XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX, XXXXXXX, XXXXXXX,                            XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-  //|--------+--------+--------+------------+--------+--------+-----------.  ,-----------+--------+--------+--------+--------+--------+--------|
-                                              XXXXXXX, XXXXXXX,   TG(LWIN2),     DF(LBASE), XXXXXXX,  XXXXXXX
-                                           //`-----------------------------'  `-----------------------------'
   ),
   // Vim motions
   [LVIMNAV] = LAYOUT_split_3x6_3_ex2(
