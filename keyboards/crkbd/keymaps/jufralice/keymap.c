@@ -27,6 +27,8 @@
 #define LPART 5
 #define LWIN1 6
 #define LWIN2 7
+#define LVIMNAV 8
+#define LVIMMOV 9
 
 
 
@@ -46,14 +48,14 @@ typedef struct {
 
 // --- tap dances ---
 // Tap Dance declarations
-enum {
+enum tap_dances {
     TD_V_ESC,
     TD_A_ESC,
     TD_CLN,
     TD_EQL,
     TD_BSPC,
-    TD_X,
     TD_QUOT,
+    TD_COLN,
     TD_SLSH,
     TD_LPRN,
     TD_RPRN,
@@ -76,10 +78,28 @@ enum {
     TD_WRS9,
     TD_WND,
     TD_WSW,
+    // for vim navigation:
+    TD_SD1,
+    TD_SU1,
+    TD_ZZ,
+    // for vim shortcuts
+    TD_YC,
+    TD_FF,
+    // apparently this TD_COUNT is needed to avoid the last tap dance to be skipped
+    TD_COUNT,
+    // end
 };
 
 enum custom_keycodes {
     BEGIN = SAFE_RANGE,
+// --- For send strings ---
+    SS_WL, //Window left
+    SS_WR, //Window right
+    SS_WU, //Window up
+    SS_WD, //Window down
+    SS_WSU, //Window size increase
+    SS_WSD, //Window size decrease
+    SS_GG, //GG for move line number
 // --- For window resize ---
     WRS1 = TD(TD_WRS1),
     WRS2 = TD(TD_WRS2),
@@ -92,6 +112,13 @@ enum custom_keycodes {
     WRS9 = TD(TD_WRS9),
     WND = TD(TD_WND),
     WSW = TD(TD_WSW),
+// --- For vim navigation ---
+    SD1 = TD(TD_SD1),
+    SU1 = TD(TD_SU1),
+    ZZ = TD(TD_ZZ), //Window center-top
+// --- For vim shortcuts ---
+    FF = TD(TD_FF), // Telescope find files
+    YC = TD(TD_YC), // Yank to clipboard or a buffer
 // --- For sm_td ---
 // https://github.com/stasmarkin/sm_td
     SMTD_KEYCODES_BEGIN,
@@ -115,12 +142,14 @@ enum custom_keycodes {
     CKC_UP,
     CKC_RIGHT,
     CKC_ENT,
+    CKC_ENT_GUI,
     CKC_STAB,
     CKC_SPACE,
     CKC_ENTER,
     CKC_SPACE3,
     CKC_ENTER3,
     CKC_TAB,
+    CKC_VIMNAV,
     SMTD_KEYCODES_END,
 };
 
@@ -149,11 +178,13 @@ void on_smtd_action(uint16_t keycode, smtd_action action, uint8_t tap_count) {
         SMTD_MT(CKC_RIGHT, KC_RIGHT, KC_LCTL)
         SMTD_MT(CKC_ENT, KC_ENT, KC_RSFT)
         SMTD_MT(CKC_STAB, G(KC_GRV), KC_LGUI)
+        SMTD_MT(CKC_ENT_GUI, KC_ENT, KC_LGUI)
         SMTD_LT(CKC_SPACE, KC_SPACE, LNUM, 2)
         SMTD_LT(CKC_ENTER, KC_ENT, LARROW, 2)
         SMTD_LT(CKC_SPACE3, KC_SPACE, LBOOT, 2)
         SMTD_LT(CKC_ENTER3, KC_ENT, LBOOT, 2)
         SMTD_LT(CKC_TAB, KC_TAB, LPART, 2)
+        SMTD_LT(CKC_VIMNAV, KC_A, LVIMNAV, 2)
     }
 }
 // --- end sm_td ---
@@ -180,31 +211,33 @@ typedef struct {
 
 td_state_t cur_dance(tap_dance_state_t *state);
 
-// For the x tap dance. Put it here so it can be used in any keymap
-void x_finished(tap_dance_state_t *state, void *user_data);
-void x_reset(tap_dance_state_t *state, void *user_data);
-//
-// For the quote tap dance. Put it here so it can be used in any keymap
+// for the quote tap dance. put it here so it can be used in any keymap
 void quot_finished(tap_dance_state_t *state, void *user_data);
 void quot_reset(tap_dance_state_t *state, void *user_data);
+void coln_finished(tap_dance_state_t *state, void *user_data);
+void coln_reset(tap_dance_state_t *state, void *user_data);
 //
-// For the parentheses tap dance. Put it here so it can be used in any keymap
+// for the parentheses tap dance. put it here so it can be used in any keymap
 void lprn_finished(tap_dance_state_t *state, void *user_data);
 void lprn_reset(tap_dance_state_t *state, void *user_data);
 void rprn_finished(tap_dance_state_t *state, void *user_data);
 void rprn_reset(tap_dance_state_t *state, void *user_data);
 //
-// For the slashes tap dance. Put it here so it can be used in any keymap
+// for the slashes tap dance. put it here so it can be used in any keymap
 void slsh_finished(tap_dance_state_t *state, void *user_data);
 void slsh_reset(tap_dance_state_t *state, void *user_data);
 
-// For the window management tap dance. Put it here so it can be used in any keymap
+// for the window management tap dance. put it here so it can be used in any keymap
 void wm_finished(tap_dance_state_t *state, void *user_data);
 void wm_reset(tap_dance_state_t *state, void *user_data);
+//
+// for the vim shortcuts tap dance. put it here so it can be used in any keymap
+void vs_finished(tap_dance_state_t *state, void *user_data);
+void vs_reset(tap_dance_state_t *state, void *user_data);
 
 // --- end of for the quad actions tap dance: ---
 
-// ---For the tap_hold tap dance:---
+// ---for the tap_hold tap dance:---
 void tap_dance_tap_hold_finished(tap_dance_state_t *state, void *user_data) {
     tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)user_data;
 
@@ -234,6 +267,9 @@ void tap_dance_tap_hold_reset(tap_dance_state_t *state, void *user_data) {
 
 #define ACTION_TAP_DANCE_FN_WINDOW_MANAGEMENT(keycode) \
     { .fn = {NULL, wm_finished, wm_reset}, .user_data = (void *)&((tap_dance_keycode){keycode}), }
+
+#define ACTION_TAP_DANCE_FN_VIM_SHORTCUT(keycode) \
+    { .fn = {NULL, vs_finished, vs_reset}, .user_data = (void *)&((tap_dance_keycode){keycode}), }
 // --- End of for tap_hold tap dance ---
 
 // --- For the quad actions tap dance: ---
@@ -287,13 +323,12 @@ td_state_t cur_dance(tap_dance_state_t *state) {
     } else return TD_UNKNOWN;
 }
 
-// Create an instance of 'td_tap_t' for the 'x' tap dance.
-static td_tap_t xtap_state = {
+// Create an instance of 'td_tap_t' for the 'quote' tap dance.
+static td_tap_t qtap_state = {
     .is_press_action = true,
     .state = TD_NONE
 };
-// Create an instance of 'td_tap_t' for the 'quote' tap dance.
-static td_tap_t qtap_state = {
+static td_tap_t colntap_state = {
     .is_press_action = true,
     .state = TD_NONE
 };
@@ -318,41 +353,36 @@ static td_tap_t wm_state = {
     .is_press_action = true,
     .state = TD_NONE
 };
+//
+// Create an instance of 'td_tap_t' for the 'vim shortcuts' tap dance.
+static td_tap_t vs_state = {
+    .is_press_action = true,
+    .state = TD_NONE
+};
 
-void x_finished(tap_dance_state_t *state, void *user_data) {
-    xtap_state.state = cur_dance(state);
-    switch (xtap_state.state) {
-        case TD_SINGLE_TAP: register_code(KC_X); break;
-        case TD_SINGLE_HOLD: register_code(KC_SCLN); break;
-        case TD_DOUBLE_TAP: register_code(KC_ESC); break;
-        case TD_DOUBLE_HOLD: register_code(KC_LALT); break;
-        // Last case is for fast typing. Assuming your key is `f`:
-        // For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
-        // In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
-        // case TD_DOUBLE_SINGLE_TAP: tap_code(KC_X); register_code(KC_X); break;
-        case TD_DOUBLE_SINGLE_TAP: register_code(KC_ESC); break;
-        default: break;
-    }
-}
 
-void x_reset(tap_dance_state_t *state, void *user_data) {
-    switch (xtap_state.state) {
-        case TD_SINGLE_TAP: unregister_code(KC_X); break;
-        case TD_SINGLE_HOLD: unregister_code(KC_SCLN); break;
-        case TD_DOUBLE_TAP: unregister_code(KC_ESC); break;
-        case TD_DOUBLE_HOLD: unregister_code(KC_LALT); break;
-        // case TD_DOUBLE_SINGLE_TAP: unregister_code(KC_X); break;
-        case TD_DOUBLE_SINGLE_TAP: unregister_code(KC_ESC); break;
-        default: break;
-    }
-    xtap_state.state = TD_NONE;
-}
 
 void quot_finished(tap_dance_state_t *state, void *user_data) {
     qtap_state.state = cur_dance(state);
     switch (qtap_state.state) {
         case TD_SINGLE_TAP: register_code(KC_QUOT); break;
-        case TD_SINGLE_HOLD: register_code16(KC_COLN); break;
+        case TD_SINGLE_HOLD: register_code16(KC_HASH); break;
+        case TD_DOUBLE_TAP: register_code(KC_SCLN); break;
+        case TD_DOUBLE_HOLD: register_code(KC_SCLN); break;
+        // Last case is for fast typing. Assuming your key is `f`:
+        // For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
+        // In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
+        // case TD_DOUBLE_SINGLE_TAP: tap_code(KC_X); register_code(KC_X); break;
+        case TD_DOUBLE_SINGLE_TAP: register_code(KC_SCLN); break;
+        default: break;
+    }
+}
+
+void coln_finished(tap_dance_state_t *state, void *user_data) {
+    colntap_state.state = cur_dance(state);
+    switch (colntap_state.state) {
+        case TD_SINGLE_TAP: register_code16(KC_COLN); break;
+        case TD_SINGLE_HOLD: register_code(KC_SCLN); break;
         case TD_DOUBLE_TAP: register_code(KC_SCLN); break;
         case TD_DOUBLE_HOLD: register_code(KC_SCLN); break;
         // Last case is for fast typing. Assuming your key is `f`:
@@ -367,7 +397,7 @@ void quot_finished(tap_dance_state_t *state, void *user_data) {
 void quot_reset(tap_dance_state_t *state, void *user_data) {
     switch (qtap_state.state) {
         case TD_SINGLE_TAP: unregister_code(KC_QUOT); break;
-        case TD_SINGLE_HOLD: unregister_code16(KC_COLN); break;
+        case TD_SINGLE_HOLD: unregister_code16(KC_HASH); break;
         case TD_DOUBLE_TAP: unregister_code(KC_SCLN); break;
         case TD_DOUBLE_HOLD: unregister_code(KC_SCLN); break;
         // case TD_DOUBLE_SINGLE_TAP: unregister_code(KC_X); break;
@@ -375,6 +405,19 @@ void quot_reset(tap_dance_state_t *state, void *user_data) {
         default: break;
     }
     qtap_state.state = TD_NONE;
+}
+
+void coln_reset(tap_dance_state_t *state, void *user_data) {
+    switch (colntap_state.state) {
+        case TD_SINGLE_TAP: unregister_code16(KC_COLN); break;
+        case TD_SINGLE_HOLD: unregister_code(KC_SCLN); break;
+        case TD_DOUBLE_TAP: unregister_code(KC_SCLN); break;
+        case TD_DOUBLE_HOLD: unregister_code(KC_SCLN); break;
+        // case TD_DOUBLE_SINGLE_TAP: unregister_code(KC_X); break;
+        case TD_DOUBLE_SINGLE_TAP: unregister_code(KC_SCLN); break;
+        default: break;
+    }
+    colntap_state.state = TD_NONE;
 }
 
 // const toto='toto'
@@ -467,31 +510,34 @@ void wm_finished(tap_dance_state_t *state, void *user_data) {
         case TD_SINGLE_TAP:
             switch (tap_keycode->keycode) {
                 case WRS1:
-                  SEND_STRING(SS_LALT(SS_LCTL(SS_LGUI(SS_TAP(X_U)))));
+                  SEND_STRING(SS_LALT(SS_LCTL(SS_LGUI("u"))));
                   break;
                 case WRS2:
-                  SEND_STRING(SS_LALT(SS_LCTL(SS_LGUI(SS_TAP(X_T)))));
+                  SEND_STRING(SS_LALT(SS_LCTL(SS_LGUI("t"))));
                   break;
                 case WRS3:
-                  SEND_STRING(SS_LALT(SS_LCTL(SS_LGUI(SS_TAP(X_I)))));
+                  SEND_STRING(SS_LALT(SS_LCTL(SS_LGUI("i"))));
                   break;
                 case WRS4:
-                  SEND_STRING(SS_LALT(SS_LCTL(SS_TAP(X_D))));
+                  SEND_STRING(SS_LALT(SS_LCTL("d")));
                   break;
                 case WRS5:
-                  SEND_STRING(SS_LALT(SS_LCTL(SS_TAP(X_F))));
+                  SEND_STRING(SS_LALT(SS_LCTL("f")));
                   break;
                 case WRS6:
-                  SEND_STRING(SS_LALT(SS_LCTL(SS_TAP(X_G))));
+                  SEND_STRING(SS_LALT(SS_LCTL("g")));
                   break;
                 case WRS7:
-                  SEND_STRING(SS_LALT(SS_LCTL(SS_LGUI(SS_TAP(X_J)))));
+                  SEND_STRING(SS_LALT(SS_LCTL(SS_LGUI("j"))));
                   break;
                 case WRS8:
-                  SEND_STRING(SS_LALT(SS_LCTL(SS_LGUI(SS_TAP(X_B)))));
+                  SEND_STRING(SS_LALT(SS_LCTL(SS_LGUI("b"))));
                   break;
                 case WRS9:
-                  SEND_STRING(SS_LALT(SS_LCTL(SS_LGUI(SS_TAP(X_L)))));
+                  SEND_STRING(SS_LALT(SS_LCTL(SS_LGUI("l"))));
+                  break;
+                case ZZ:
+                  SEND_STRING("zz");
                   break;
                 default:
                   break;
@@ -529,6 +575,9 @@ void wm_finished(tap_dance_state_t *state, void *user_data) {
                 case WRS9:
                   SEND_STRING(SS_LALT(SS_LCTL(SS_TAP(X_K))));
                   break;
+                case ZZ:
+                  SEND_STRING("zt");
+                  break;
                 default:
                   break;
             }
@@ -561,6 +610,9 @@ void wm_finished(tap_dance_state_t *state, void *user_data) {
                   break;
                 case WRS9:
                   /* SEND_STRING(SS_LALT(SS_LCTL(SS_TAP(X_K)))); */
+                  break;
+                case ZZ:
+                  SEND_STRING("zu");
                   break;
                 default:
                   break;
@@ -606,6 +658,61 @@ void wm_finished(tap_dance_state_t *state, void *user_data) {
     }
 }
 
+void vs_finished(tap_dance_state_t *state, void *user_data) {
+    tap_dance_keycode *tap_keycode = (tap_dance_keycode *)user_data;
+
+
+    vs_state.state = cur_dance(state);
+    switch (vs_state.state) {
+        case TD_SINGLE_TAP:
+            switch (tap_keycode->keycode) {
+                case FF:
+                  SEND_STRING(SS_TAP(X_SPACE) "ff");
+                  break;
+                case YC:
+                  /* SEND_STRING(SS_LSFT(SS_TAP(X_QUOT)) "ay"); */
+                  SEND_STRING("\"ay");
+                  break;
+                default:
+                  break;
+            }
+            break;
+        case TD_SINGLE_HOLD:
+            switch (tap_keycode->keycode) {
+                case FF:
+                  SEND_STRING(SS_TAP(X_SPACE) "gs");
+                  break;
+                case YC:
+                  SEND_STRING("\"*y");
+                  break;
+                default:
+                  break;
+            }
+            break;
+        case TD_DOUBLE_TAP:
+            switch (tap_keycode->keycode) {
+                case YC:
+                  SEND_STRING("\"ap");
+                  break;
+                default:
+                  break;
+            }
+            break;
+        case TD_DOUBLE_HOLD:
+            /* switch (tap_keycode->keycode) {
+                case FF:
+                  // SEND_STRING(SS_LALT(SS_LCTL(SS_TAP(X_U))));
+                  break;
+                default:
+                  break;
+            } */
+            break;
+        case TD_DOUBLE_SINGLE_TAP:
+            break;
+        default: break;
+    }
+}
+
 void wm_reset(tap_dance_state_t *state, void *user_data) {
     /* switch (wm_state.state) {
         case TD_SINGLE_TAP:
@@ -622,6 +729,11 @@ void wm_reset(tap_dance_state_t *state, void *user_data) {
     wm_state.state = TD_NONE;
 }
 
+
+void vs_reset(tap_dance_state_t *state, void *user_data) {
+    vs_state.state = TD_NONE;
+}
+
 // --- End of for the quad actions tap dance: ---
 
 // Tap Dance definitions
@@ -634,15 +746,15 @@ tap_dance_action_t tap_dance_actions[] = {
     [TD_BSPC] = ACTION_TAP_DANCE_TAP_HOLD(KC_BSPC, KC_RPRN),
     [TD_COM] = ACTION_TAP_DANCE_TAP_HOLD(KC_COMM, KC_QUES),
     [TD_DOT] = ACTION_TAP_DANCE_TAP_HOLD(KC_DOT, KC_EXLM),
-    [TD_LPRN] = ACTION_TAP_DANCE_TAP_HOLD(KC_LPRN, KC_LBRC),
-    [TD_RPRN] = ACTION_TAP_DANCE_TAP_HOLD(KC_RPRN, KC_RBRC),
+    [TD_LPRN] = ACTION_TAP_DANCE_TAP_HOLD(KC_LPRN, KC_LCBR),
+    [TD_RPRN] = ACTION_TAP_DANCE_TAP_HOLD(KC_RPRN, KC_RCBR),
     [TD_LBRC] = ACTION_TAP_DANCE_TAP_HOLD(KC_LBRC, KC_RBRC),
     [TD_AMPR] = ACTION_TAP_DANCE_TAP_HOLD(KC_AMPR, KC_PIPE),
     [TD_DLR] = ACTION_TAP_DANCE_TAP_HOLD(KC_DLR, KC_PERC),
     [TD_AT] = ACTION_TAP_DANCE_TAP_HOLD(KC_AT, KC_HASH),
     [TD_CIRC] = ACTION_TAP_DANCE_TAP_HOLD(KC_CIRC, KC_TILD),
-    [TD_X] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, x_finished, x_reset),
     [TD_QUOT] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, quot_finished, quot_reset),
+    [TD_COLN] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, coln_finished, coln_reset),
     // [TD_LPRN] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, lprn_finished, lprn_reset),
     // [TD_RPRN] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, rprn_finished, rprn_reset),
     [TD_SLSH] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, slsh_finished, slsh_reset),
@@ -658,6 +770,13 @@ tap_dance_action_t tap_dance_actions[] = {
     [TD_WRS9] = ACTION_TAP_DANCE_FN_WINDOW_MANAGEMENT(WRS9),
     [TD_WND] = ACTION_TAP_DANCE_TAP_HOLD(G(KC_N), G(KC_W)),
     [TD_WSW] = ACTION_TAP_DANCE_TAP_HOLD(G(KC_GRV), KC_LGUI),
+    // For vim navigation:
+    [TD_SD1] = ACTION_TAP_DANCE_TAP_HOLD(C(KC_E), C(KC_D)),
+    [TD_SU1] = ACTION_TAP_DANCE_TAP_HOLD(C(KC_Y), C(KC_U)),
+    [TD_ZZ] = ACTION_TAP_DANCE_FN_WINDOW_MANAGEMENT(ZZ),
+    // For vim shortcuts:
+    [TD_FF] = ACTION_TAP_DANCE_FN_VIM_SHORTCUT(FF),
+    [TD_YC] = ACTION_TAP_DANCE_FN_VIM_SHORTCUT(YC),
 
 };
 // --- End Tap dances ---
@@ -696,6 +815,42 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             break;
          */
+        // -- For send_strings:
+        case SS_WL:
+            if(record->event.pressed){
+                SEND_STRING(SS_LCTL("w") "h");
+            }
+            break;
+        case SS_WR:
+            if(record->event.pressed){
+                SEND_STRING(SS_LCTL("w") "l");
+            }
+            break;
+        case SS_WD:
+            if(record->event.pressed){
+                SEND_STRING(SS_LCTL("w") "j");
+            }
+            break;
+        case SS_WU:
+            if(record->event.pressed){
+                SEND_STRING(SS_LCTL("w") "k");
+            }
+            break;
+        case SS_WSU:
+            if(record->event.pressed){
+                SEND_STRING(SS_LCTL("w") "y");
+            }
+            break;
+        case SS_WSD:
+            if(record->event.pressed){
+                SEND_STRING(SS_LCTL("w") "u");
+            }
+            break;
+        case SS_GG:
+            if(record->event.pressed){
+                SEND_STRING("gg");
+            }
+            break;
         // -- For tap dances 'tap-hold':
         case TD(TD_A_ESC):  // list all tap dance keycodes with tap-hold configurations
         case TD(TD_CLN):
@@ -712,6 +867,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case TD(TD_CIRC):
         case WND:
         case WSW:
+        case SD1:
+        case SU1:
             action = &tap_dance_actions[QK_TAP_DANCE_GET_INDEX(keycode)];
             if (!record->event.pressed && action->state.count && !action->state.finished) {
                 tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)action->user_data;
@@ -731,13 +888,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // Main layer
   [LBASE] = LAYOUT_split_3x6_3_ex2(
-  //,------------------------------------------------------------------------.  ,----------------------------------------------------------------------------.
-        XXXXXXX,     KC_Q,     KC_W,     KC_E,        KC_R,     KC_T, XXXXXXX,     XXXXXXX,     KC_Y,     KC_U,       KC_I,       KC_O,     KC_P,     XXXXXXX,
-  //|---------+---------+---------+---------+------------+---------+---------|  |---------+---------+---------+-----------+-----------+---------+------------|
-        KC_ESC,    CKC_A,    CKC_S,    CKC_D,       CKC_F,     KC_G,  XXXXXXX,     XXXXXXX,     KC_H,    CKC_J,      CKC_K,      CKC_L, CKC_UNDS, TD(TD_QUOT),
-  //|---------+---------+---------+---------+------------+---------+---------'  `---------+---------+---------+-----------+-----------+---------+------------|
-        KC_GRV,     KC_Z, TD(TD_X),     KC_C,TD(TD_V_ESC),     KC_B,                            KC_N,     KC_M, TD(TD_COM), TD(TD_DOT),  XXXXXXX,     XXXXXXX,
-  //|---------+---------+---------+---------+------------+---------+---------.  ,---------+---------+---------+-----------+-----------+---------+------------|
+  //,------------------------------------------------------------------------.  ,-------------------------------------------------------------------------------.
+        XXXXXXX,     KC_Q,     KC_W,     KC_E,        KC_R,     KC_T, XXXXXXX,     XXXXXXX,     KC_Y,     KC_U,       KC_I,       KC_O,        KC_P,     XXXXXXX,
+  //|---------+---------+---------+---------+------------+---------+---------|  |---------+---------+---------+-----------+-----------+------------+------------|
+        KC_ESC,    CKC_A,    CKC_S,    CKC_D,       CKC_F,     KC_G,  XXXXXXX,     XXXXXXX,     KC_H,    CKC_J,      CKC_K,      CKC_L,    CKC_UNDS, TD(TD_QUOT),
+  //|---------+---------+---------+---------+------------+---------+---------'  `---------+---------+---------+-----------+-----------+------------+------------|
+        KC_GRV,     KC_Z,     KC_X,     KC_C,TD(TD_V_ESC),     KC_B,                            KC_N,     KC_M, TD(TD_COM), TD(TD_DOT), TD(TD_COLN),     XXXXXXX,
+  //|---------+---------+---------+---------+------------+---------+---------.  ,---------+---------+---------+-----------+-----------+------------+------------|
                                                   XXXXXXX,  CKC_TAB,CKC_ENTER,   CKC_SPACE,  KC_BSPC, XXXXXXX
                                                //`---------------------------'  `----------------------------'
 
@@ -749,7 +906,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+-----------+--------+----------|  |--------+-----------+-----------+--------+--------+----------+-----------|
       _______,   CKC_1,   CKC_2,   CKC_3,      CKC_4,    KC_5,   XXXXXXX,    XXXXXXX,       KC_6,      CKC_7,   CKC_8,   CKC_9,     CKC_0, TD(TD_CLN),
   //|--------+--------+--------+--------+-----------+--------+----------'  `--------+-----------+-----------+--------+--------+----------+-----------|
-      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX,                           XXXXXXX,    XXXXXXX, XXXXXXX,  KC_DOT,   XXXXXXX, CKC_ENTER3,
+      XXXXXXX,    KC_J, XXXXXXX, XXXXXXX,      SS_GG, XXXXXXX,                           XXXXXXX,    XXXXXXX, XXXXXXX,  KC_DOT,      KC_K, CKC_ENTER3,
   //|--------+--------+--------+--------+-----------+--------+----------.  ,--------+-----------+-----------+--------+--------+----------+-----------|
                                               KC_TAB,KC_SPACE,CKC_ENTER3,    _______,    XXXXXXX,     XXXXXXX
                                         //`-----------------------------'  `--------------------------------'
@@ -757,15 +914,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   // Arrows layer (Left thumb1)
   [LARROW] = LAYOUT_split_3x6_3_ex2(
-  //,--------------------------------------------------------------.  ,---------------------------------------------------------------------------.
-      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX, TD(TD_AT),TD(TD_AMPR),TD(TD_DLR), TD(TD_CIRC), XXXXXXX, XXXXXXX,
-  //|--------+--------+--------+--------+--------+--------+--------|  |----------+----------+-----------+----------+------------+--------+--------|
-      _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX,   KC_LEFT,   CKC_DOWN,    CKC_UP,   CKC_RIGHT, CKC_ENT, XXXXXXX,
-  //|--------+--------+--------+--------+--------+--------+--------'  `----------+----------+-----------+----------+------------+--------+--------|
-   CKC_SPACE3, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                          XXXXXXX,      DF(LWIN1),   XXXXXXX,     XXXXXXX, XXXXXXX, KC_TILD,
-  //|--------+--------+--------+--------+--------+--------+--------.  ,----------+----------+-----------+----------+------------+--------+--------|
-                                          XXXXXXX, XXXXXXX, _______,   CKC_SPACE3,   KC_BSPC, XXXXXXX
-                                      //`--------------------------'  `----------------------------'
+  //,---------------------------------------------------------------------.  ,---------------------------------------------------------------------------.
+      XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX,        YC, DF(LVIMMOV),   XXXXXXX,     XXXXXXX, XXXXXXX, XXXXXXX,
+  //|--------+-----------+--------+--------+------------+--------+--------|  |----------+----------+-----------+----------+------------+--------+--------|
+      _______, CKC_VIMNAV,   CKC_2,      FF, CKC_ENT_GUI, XXXXXXX, XXXXXXX,      XXXXXXX,   KC_LEFT,   CKC_DOWN,    CKC_UP,   CKC_RIGHT, CKC_ENT, XXXXXXX,
+  //|--------+-----------+--------+--------+------------+--------+--------'  `----------+----------+-----------+----------+------------+--------+--------|
+   CKC_SPACE3,    XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX, XXXXXXX,                          XXXXXXX,  DF(LWIN1),   XXXXXXX,     XXXXXXX, XXXXXXX, KC_TILD,
+  //|--------+-----------+--------+--------+------------+--------+--------.  ,----------+----------+-----------+----------+------------+--------+--------|
+                                                 XXXXXXX, XXXXXXX, _______,   CKC_SPACE3,   KC_BSPC,    XXXXXXX
+                                      //`---------------------------------'  `---------------------------------'
   ),
 
   // Boot, flash and led layer (two thumbs1)
@@ -783,11 +940,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // Parentheses layer (left thumb2)
   [LPART] = LAYOUT_split_3x6_3_ex2(
   //,--------------------------------------------------------------.  ,----------------------------------------------------------------------.
-      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX,     KC_LCBR,     XXXXXXX, KC_RCBR, XXXXXXX, XXXXXXX,
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, TD(TD_LPRN),      KC_GRV, TD(TD_RPRN), XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+------------+------------+--------+--------+--------|
-      XXXXXXX,   CKC_1, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, TD(TD_LPRN), TD(TD_SLSH), TD(TD_RPRN), XXXXXXX, XXXXXXX,
+      XXXXXXX,   CKC_1, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX,     KC_LBRC, TD(TD_SLSH), KC_RBRC, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------'  `--------+--------+------------+------------+--------+--------+--------|
-      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX,     XXXXXXX,     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      TD(TD_AT),TD(TD_AMPR),TD(TD_DLR), TD(TD_CIRC), XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------.  ,--------+--------+------------+------------+--------+--------+--------|
                                           XXXXXXX, _______, XXXXXXX,   KC_SPACE, KC_BSPC,     XXXXXXX
                                       //`--------------------------'  `------------------------------'
@@ -827,6 +984,30 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+------------+--------+--------+-----------.  ,-----------+--------+--------+--------+--------+--------+--------|
                                               XXXXXXX, XXXXXXX,   TG(LWIN2),     DF(LBASE), XXXXXXX,  XXXXXXX
                                            //`-----------------------------'  `-----------------------------'
+  ),
+  // Vim motions
+  [LVIMNAV] = LAYOUT_split_3x6_3_ex2(
+  //,--------------------------------------------------------------.  ,---------------------------------------------------------------------------.
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX,   XXXXXXX,     SS_WSU,    SS_WSD,    XXXXXXX, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------+--------+--------+--------+--------|  |----------+----------+-----------+----------+------------+--------+--------|
+      XXXXXXX, _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX,     SS_WL,        SD1,       SU1,       SS_WR, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------+--------+--------+--------+--------'  `----------+----------+-----------+----------+------------+--------+--------|
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                          XXXXXXX,      SS_WD,     SS_WU,     XXXXXXX, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------+--------+--------+--------+--------.  ,----------+----------+-----------+----------+------------+--------+--------|
+                                          XXXXXXX, XXXXXXX, _______,           ZZ,   XXXXXXX,    XXXXXXX
+                                      //`--------------------------'  `---------------------------------'
+  ),
+  // Vim movements
+  [LVIMMOV] = LAYOUT_split_3x6_3_ex2(
+  //,--------------------------------------------------------------.  ,--------------------------------------------------------------.
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------+--------+--------+--------+--------'  `--------+--------+--------+--------+--------+--------+--------|
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------+--------+--------+--------+--------.  ,--------+--------+--------+--------+--------+--------+--------|
+                                          XXXXXXX, XXXXXXX, DF(LBASE),    _______, XXXXXXX, XXXXXXX
+                                      //`--------------------------'  `--------------------------'
   )
   // Template layer (to copy past)
   /*[x] = LAYOUT_split_3x6_3_ex2(
@@ -925,8 +1106,11 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
         case TD(TD_LPRN):
         case TD(TD_LBRC):
         case TD(TD_RPRN):
+        case ZZ:
+        case FF:
             return 100;
         case TD(TD_QUOT):
+        case TD(TD_COLN):
         case TD(TD_SLSH):
         case WRS1:
         case WRS2:
@@ -937,6 +1121,8 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
         case WRS7:
         case WRS8:
         case WRS9:
+        case SD1:
+        case SU1:
             return 120;
         default:
             return TAPPING_TERM;
@@ -957,14 +1143,26 @@ uint32_t get_smtd_timeout(uint16_t keycode, smtd_timeout timeout) {
         case CKC_UNDS:
             if (timeout == SMTD_TIMEOUT_RELEASE) return 1;
             break;
+        case CKC_1:
+        case CKC_2:
+        case CKC_3:
+        case CKC_4:
+        case CKC_7:
+        case CKC_8:
+        case CKC_9:
+        case CKC_0:
+            if (timeout == SMTD_TIMEOUT_RELEASE) return 1;
+            break;
         case CKC_TAB:
         case CKC_ENTER:
+        case CKC_VIMNAV:
             if (timeout == SMTD_TIMEOUT_TAP) return 100;
             if (timeout == SMTD_TIMEOUT_FOLLOWING_TAP) return 10;
             break;
         case CKC_SPACE:
             if (timeout == SMTD_TIMEOUT_TAP) return 150;
-            if (timeout == SMTD_TIMEOUT_FOLLOWING_TAP) return 10;
+            if (timeout == SMTD_TIMEOUT_FOLLOWING_TAP) return 100;
+            if (timeout == SMTD_TIMEOUT_RELEASE) return 10;
             break;
     }
 
