@@ -100,6 +100,24 @@ enum custom_keycodes {
     SS_WSU, //Window size increase
     SS_WSD, //Window size decrease
     SS_GG, //GG for move line number
+// --- For tap dances ---
+    V_ESC = TD(TD_V_ESC),
+    A_ESC = TD(TD_A_ESC),
+    CLN = TD(TD_CLN),
+    EQL = TD(TD_EQL),
+    BSPC = TD(TD_BSPC),
+    QUOT = TD(TD_QUOT),
+    COLN = TD(TD_COLN),
+    SLSH = TD(TD_SLSH),
+    LPRN = TD(TD_LPRN),
+    RPRN = TD(TD_RPRN),
+    LBRC = TD(TD_LBRC),
+    AMPR = TD(TD_AMPR),
+    DLR = TD(TD_DLR),
+    AT = TD(TD_AT),
+    CIRC = TD(TD_CIRC),
+    COM = TD(TD_COM),
+    DOT = TD(TD_DOT),
 // --- For window resize ---
     WRS1 = TD(TD_WRS1),
     WRS2 = TD(TD_WRS2),
@@ -852,30 +870,29 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             break;
         // -- For tap dances 'tap-hold':
-        case TD(TD_A_ESC):  // list all tap dance keycodes with tap-hold configurations
-        case TD(TD_CLN):
-        case TD(TD_EQL):
-        case TD(TD_BSPC):
-        case TD(TD_COM):
-        case TD(TD_DOT):
-        case TD(TD_LPRN):
-        case TD(TD_RPRN):
-        case TD(TD_LBRC):
-        case TD(TD_AMPR):
-        case TD(TD_DLR):
-        case TD(TD_AT):
-        case TD(TD_CIRC):
-        case WND:
-        case WSW:
-        case SD1:
-        case SU1:
-            action = &tap_dance_actions[QK_TAP_DANCE_GET_INDEX(keycode)];
-            if (!record->event.pressed && action->state.count && !action->state.finished) {
-                tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)action->user_data;
-                tap_code16(tap_hold->tap);
-            }
-            break;
-
+          case A_ESC:  // list all tap dance keycodes with tap-hold configurations
+          case CLN:
+          case EQL:
+          case BSPC:
+          case COM:
+          case DOT:
+          case LPRN:
+          case RPRN:
+          case LBRC:
+          case AMPR:
+          case DLR:
+          case AT:
+          case CIRC:
+          case WND:
+          case WSW:
+          case SD1:
+          case SU1:
+              action = &tap_dance_actions[QK_TAP_DANCE_GET_INDEX(keycode)];
+              if (!record->event.pressed && action->state.count && !action->state.finished) {
+                  tap_dance_tap_hold_t *tap_hold = (tap_dance_tap_hold_t *)action->user_data;
+                  tap_code16(tap_hold->tap);
+              }
+              break;
     }
     return true;
 }
@@ -891,9 +908,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //,------------------------------------------------------------------------.  ,-------------------------------------------------------------------------------.
         XXXXXXX,     KC_Q,     KC_W,     KC_E,        KC_R,     KC_T, XXXXXXX,     XXXXXXX,     KC_Y,     KC_U,       KC_I,       KC_O,        KC_P,     XXXXXXX,
   //|---------+---------+---------+---------+------------+---------+---------|  |---------+---------+---------+-----------+-----------+------------+------------|
-        KC_ESC,    CKC_A,    CKC_S,    CKC_D,       CKC_F,     KC_G,  XXXXXXX,     XXXXXXX,     KC_H,    CKC_J,      CKC_K,      CKC_L,    CKC_UNDS, TD(TD_QUOT),
+        KC_ESC,    CKC_A,    CKC_S,    CKC_D,       CKC_F,     KC_G,  XXXXXXX,     XXXXXXX,     KC_H,    CKC_J,      CKC_K,      CKC_L,    CKC_UNDS, QUOT,
   //|---------+---------+---------+---------+------------+---------+---------'  `---------+---------+---------+-----------+-----------+------------+------------|
-        KC_GRV,     KC_Z,     KC_X,     KC_C,TD(TD_V_ESC),     KC_B,                            KC_N,     KC_M, TD(TD_COM), TD(TD_DOT), TD(TD_COLN),     XXXXXXX,
+        KC_GRV,     KC_Z,     KC_X,     KC_C,     V_ESC,     KC_B,                            KC_N,     KC_M, COM, DOT, COLN,     XXXXXXX,
   //|---------+---------+---------+---------+------------+---------+---------.  ,---------+---------+---------+-----------+-----------+------------+------------|
                                                   XXXXXXX,  CKC_TAB,CKC_ENTER,   CKC_SPACE,  KC_BSPC, XXXXXXX
                                                //`---------------------------'  `----------------------------'
@@ -902,9 +919,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // Numbers layer (calculs,...) (Right thumb1)
   [LNUM] = LAYOUT_split_3x6_3_ex2(
   //,-------------------------------------------------------------------.  ,-------------------------------------------------------------------------.
-      XXXXXXX, XXXXXXX, KC_ASTR, KC_PLUS, TD(TD_EQL), XXXXXXX,   XXXXXXX,    XXXXXXX,TD(TD_LBRC),TD(TD_BSPC), KC_MINS, KC_SLSH,   XXXXXXX,    XXXXXXX,
+      XXXXXXX, XXXXXXX, KC_ASTR, KC_PLUS, EQL, XXXXXXX,   XXXXXXX,    XXXXXXX, LBRC, BSPC, KC_MINS, KC_SLSH,   XXXXXXX,    XXXXXXX,
   //|--------+--------+--------+--------+-----------+--------+----------|  |--------+-----------+-----------+--------+--------+----------+-----------|
-      _______,   CKC_1,   CKC_2,   CKC_3,      CKC_4,    KC_5,   XXXXXXX,    XXXXXXX,       KC_6,      CKC_7,   CKC_8,   CKC_9,     CKC_0, TD(TD_CLN),
+      _______,   CKC_1,   CKC_2,   CKC_3,      CKC_4,    KC_5,   XXXXXXX,    XXXXXXX,       KC_6,      CKC_7,   CKC_8,   CKC_9,     CKC_0, CLN,
   //|--------+--------+--------+--------+-----------+--------+----------'  `--------+-----------+-----------+--------+--------+----------+-----------|
       XXXXXXX,    KC_J, XXXXXXX, XXXXXXX,      SS_GG, XXXXXXX,                           XXXXXXX,    XXXXXXX, XXXXXXX,  KC_DOT,      KC_K, CKC_ENTER3,
   //|--------+--------+--------+--------+-----------+--------+----------.  ,--------+-----------+-----------+--------+--------+----------+-----------|
@@ -934,17 +951,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------+--------'  `--------+--------+--------+--------+--------+--------+--------|
       RGB_MOD, RGB_HUD, RGB_SAD, RGB_VAD, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, DT_DOWN, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------.  ,--------+--------+--------+--------+--------+--------+--------|
-                                           KC_ESC, XXXXXXX, _______,    _______, KC_BSPC, KC_RGUI
+                                          KC_ESC, XXXXXXX, _______,    _______, KC_BSPC, KC_RGUI
                                       //`--------------------------'  `--------------------------'
   ),
   // Parentheses layer (left thumb2)
   [LPART] = LAYOUT_split_3x6_3_ex2(
   //,--------------------------------------------------------------.  ,----------------------------------------------------------------------.
-      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, TD(TD_LPRN),      KC_GRV, TD(TD_RPRN), XXXXXXX, XXXXXXX,
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, LPRN,      KC_GRV, RPRN, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+------------+------------+--------+--------+--------|
-      XXXXXXX,   CKC_1, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX,     KC_LBRC, TD(TD_SLSH), KC_RBRC, XXXXXXX, XXXXXXX,
+      XXXXXXX,   CKC_1, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX,     KC_LBRC, SLSH, KC_RBRC, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------'  `--------+--------+------------+------------+--------+--------+--------|
-      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      TD(TD_AT),TD(TD_AMPR),TD(TD_DLR), TD(TD_CIRC), XXXXXXX, XXXXXXX,
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      AT, AMPR, DLR, CIRC, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------.  ,--------+--------+------------+------------+--------+--------+--------|
                                           XXXXXXX, _______, XXXXXXX,   KC_SPACE, KC_BSPC,     XXXXXXX
                                       //`--------------------------'  `------------------------------'
@@ -1092,38 +1109,38 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
 
 uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        case TD(TD_AMPR):
-        case TD(TD_DLR):
-        case TD(TD_AT):
-        case TD(TD_CIRC):
-            return 80;
-        case TD(TD_A_ESC):
-        case TD(TD_CLN):
-        case TD(TD_COM):
-        case TD(TD_DOT):
-        case TD(TD_EQL):
-        case TD(TD_BSPC):
-        case TD(TD_LPRN):
-        case TD(TD_LBRC):
-        case TD(TD_RPRN):
-        case ZZ:
-        case FF:
-            return 100;
-        case TD(TD_QUOT):
-        case TD(TD_COLN):
-        case TD(TD_SLSH):
-        case WRS1:
-        case WRS2:
-        case WRS3:
-        case WRS4:
-        case WRS5:
-        case WRS6:
-        case WRS7:
-        case WRS8:
-        case WRS9:
-        case SD1:
-        case SU1:
-            return 120;
+          case AMPR:
+          case DLR:
+          case AT:
+          case CIRC:
+              return 80;
+          case A_ESC:
+          case CLN:
+          case COM:
+          case DOT:
+          case EQL:
+          case BSPC:
+          case LPRN:
+          case LBRC:
+          case RPRN:
+          case ZZ:
+          case FF:
+              return 100;
+          case QUOT:
+          case COLN:
+          case SLSH:
+          case WRS1:
+          case WRS2:
+          case WRS3:
+          case WRS4:
+          case WRS5:
+          case WRS6:
+          case WRS7:
+          case WRS8:
+          case WRS9:
+          case SD1:
+          case SU1:
+              return 120;
         default:
             return TAPPING_TERM;
     }
