@@ -1035,9 +1035,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //,------------------------------------------------------------------------.  ,-------------------------------------------------------------------------------.
         XXXXXXX,     KC_Q,     KC_W,     KC_E,        KC_R,     KC_T, XXXXXXX,     XXXXXXX,     KC_Y,     KC_U,       KC_I,       KC_O,        KC_P,     XXXXXXX,
   //|---------+---------+---------+---------+------------+---------+---------|  |---------+---------+---------+-----------+-----------+------------+------------|
-        KC_ESC,    CKC_A,    CKC_S,    CKC_D,       CKC_F,     KC_G,  XXXXXXX,     XXXXXXX,     KC_H,    CKC_J,      CKC_K,      CKC_L,    CKC_UNDS, QUOT,
+        KC_ESC,    CKC_A,    CKC_S,    CKC_D,       CKC_F,     KC_G,  XXXXXXX,     XXXXXXX,     KC_H,    CKC_J,      CKC_K,      CKC_L,    CKC_UNDS,        QUOT,
   //|---------+---------+---------+---------+------------+---------+---------'  `---------+---------+---------+-----------+-----------+------------+------------|
-        KC_GRV,     KC_Z,     KC_X,     KC_C,     V_ESC,     KC_B,                            KC_N,     KC_M, COM, DOT, COLN,     XXXXXXX,
+        KC_GRV,     KC_Z,     KC_X,     KC_C,     V_ESC,       KC_B,                            KC_N,     KC_M,        COM,        DOT,        COLN,     XXXXXXX,
   //|---------+---------+---------+---------+------------+---------+---------.  ,---------+---------+---------+-----------+-----------+------------+------------|
                                                   XXXXXXX,  CKC_TAB,CKC_ENTER,   CKC_SPACE,  KC_BSPC, XXXXXXX
                                                //`---------------------------'  `----------------------------'
@@ -1046,9 +1046,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // Numbers layer (calculs,...) (Right thumb1)
   [LNUM] = LAYOUT_split_3x6_3_ex2(
   //,-------------------------------------------------------------------.  ,-------------------------------------------------------------------------.
-      XXXXXXX, XXXXXXX, KC_ASTR, KC_PLUS, EQL, XXXXXXX,   XXXXXXX,    XXXXXXX, LBRC, BSPC, KC_MINS, KC_SLSH,   XXXXXXX,    XXXXXXX,
+      XXXXXXX, XXXXXXX, KC_ASTR, KC_PLUS,        EQL, XXXXXXX,   XXXXXXX,    XXXXXXX,       LBRC,       BSPC, KC_MINS, KC_SLSH,   XXXXXXX,    XXXXXXX,
   //|--------+--------+--------+--------+-----------+--------+----------|  |--------+-----------+-----------+--------+--------+----------+-----------|
-      _______,   CKC_1,   CKC_2,   CKC_3,      CKC_4,    KC_5,   XXXXXXX,    XXXXXXX,       KC_6,      CKC_7,   CKC_8,   CKC_9,     CKC_0, CLN,
+      _______,   CKC_1,   CKC_2,   CKC_3,      CKC_4,    KC_5,   XXXXXXX,    XXXXXXX,       KC_6,      CKC_7,   CKC_8,   CKC_9,     CKC_0,        CLN,
   //|--------+--------+--------+--------+-----------+--------+----------'  `--------+-----------+-----------+--------+--------+----------+-----------|
       XXXXXXX,    KC_J, XXXXXXX, XXXXXXX,      SS_GG, XXXXXXX,                           XXXXXXX,    XXXXXXX, XXXXXXX,  KC_DOT,      KC_K, CKC_ENTER3,
   //|--------+--------+--------+--------+-----------+--------+----------.  ,--------+-----------+-----------+--------+--------+----------+-----------|
