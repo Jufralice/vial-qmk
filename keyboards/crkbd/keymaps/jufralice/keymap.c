@@ -384,7 +384,7 @@ void quot_finished(tap_dance_state_t *state, void *user_data) {
     qtap_state.state = cur_dance(state);
     switch (qtap_state.state) {
         case TD_SINGLE_TAP: register_code(KC_QUOT); break;
-        case TD_SINGLE_HOLD: register_code16(KC_HASH); break;
+        case TD_SINGLE_HOLD: register_code16(KC_SCLN); break;
         case TD_DOUBLE_TAP: register_code(KC_SCLN); break;
         case TD_DOUBLE_HOLD: register_code(KC_SCLN); break;
         // Last case is for fast typing. Assuming your key is `f`:
@@ -415,7 +415,7 @@ void coln_finished(tap_dance_state_t *state, void *user_data) {
 void quot_reset(tap_dance_state_t *state, void *user_data) {
     switch (qtap_state.state) {
         case TD_SINGLE_TAP: unregister_code(KC_QUOT); break;
-        case TD_SINGLE_HOLD: unregister_code16(KC_HASH); break;
+        case TD_SINGLE_HOLD: unregister_code16(KC_SCLN); break;
         case TD_DOUBLE_TAP: unregister_code(KC_SCLN); break;
         case TD_DOUBLE_HOLD: unregister_code(KC_SCLN); break;
         // case TD_DOUBLE_SINGLE_TAP: unregister_code(KC_X); break;
@@ -769,7 +769,7 @@ tap_dance_action_t tap_dance_actions[] = {
     [TD_LBRC] = ACTION_TAP_DANCE_TAP_HOLD(KC_LBRC, KC_RBRC),
     [TD_AMPR] = ACTION_TAP_DANCE_TAP_HOLD(KC_AMPR, KC_PIPE),
     [TD_DLR] = ACTION_TAP_DANCE_TAP_HOLD(KC_DLR, KC_PERC),
-    [TD_AT] = ACTION_TAP_DANCE_TAP_HOLD(KC_AT, KC_HASH),
+    [TD_AT] = ACTION_TAP_DANCE_TAP_HOLD(KC_HASH, KC_AT),
     [TD_CIRC] = ACTION_TAP_DANCE_TAP_HOLD(KC_CIRC, KC_TILD),
     [TD_QUOT] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, quot_finished, quot_reset),
     [TD_COLN] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, coln_finished, coln_reset),
@@ -1032,7 +1032,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // Main layer
   [LBASE] = LAYOUT_split_3x6_3_ex2(
-  //,------------------------------------------------------------------------.  ,-------------------------------------------------------------------------------.
+  //,------------------------------------------------------------------------.  -------------------------------------------------------------------------------.
         XXXXXXX,     KC_Q,     KC_W,     KC_E,        KC_R,     KC_T, XXXXXXX,     XXXXXXX,     KC_Y,     KC_U,       KC_I,       KC_O,        KC_P,     XXXXXXX,
   //|---------+---------+---------+---------+------------+---------+---------|  |---------+---------+---------+-----------+-----------+------------+------------|
         KC_ESC,    CKC_A,    CKC_S,    CKC_D,       CKC_F,     KC_G,  XXXXXXX,     XXXXXXX,     KC_H,    CKC_J,      CKC_K,      CKC_L,    CKC_UNDS,        QUOT,
@@ -1230,7 +1230,7 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
           case FF:
               return 100;
           case QUOT:
-          case COLN:
+          /* case COLN: */
           case SLSH:
           case WRS1:
           case WRS2:
