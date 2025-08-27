@@ -27,7 +27,8 @@
 #define LPART 4
 #define LWIN1 5
 #define LVIMNAV 6
-#define LVIMMOV 9
+#define LVIMGIT 7
+#define LVIMMOV 8
 
 
 
@@ -84,6 +85,12 @@ enum tap_dances {
     // for vim shortcuts
     TD_YC,
     TD_FF,
+    TD_GSH,
+    TD_GRH,
+    TD_GPV,
+    TD_GTD,
+    TD_GDT,
+    TD_GBL,
 };
 
 enum custom_keycodes {
@@ -95,7 +102,12 @@ enum custom_keycodes {
     SS_WD, //Window down
     SS_WSU, //Window size increase
     SS_WSD, //Window size decrease
+    SS_WSR, //Window size reset
     SS_GG, //GG for move line number
+    SS_GUS, //Git undo stage hunk
+    SS_QR, //Quit(close) current window and resize
+    SS_GNH, //Git next hunk
+    SS_GPH, //Git previous hunk
 // --- For sm_td ---
 // https://github.com/stasmarkin/sm_td
 
@@ -169,6 +181,13 @@ enum tapdances_keycodes {
 // --- For vim shortcuts ---
     FF = TD(TD_FF), // Telescope find files
     YC = TD(TD_YC), // Yank to clipboard or a buffer
+// --- For vim git shortcuts (gitsigns,...) ---
+    GSH = TD(TD_GSH), // git stage hunk
+    GRH = TD(TD_GRH), // git reset hunk
+    GPV = TD(TD_GPV), // git preview hunk
+    GTD = TD(TD_GTD), // git toggle diffs
+    GDT = TD(TD_GDT), // git diff this
+    GBL = TD(TD_GBL), // git blame
 };
 
 
@@ -691,6 +710,25 @@ void vs_finished(tap_dance_state_t *state, void *user_data) {
                   /* SEND_STRING(SS_LSFT(SS_TAP(X_QUOT)) "ay"); */
                   SEND_STRING("\"ay");
                   break;
+                case GSH:
+                  SEND_STRING(SS_TAP(X_SPACE) "hs");
+                  break;
+                case GRH:
+                  SEND_STRING(SS_TAP(X_SPACE) "hr");
+                  break;
+                case GPV:
+                  SEND_STRING(SS_TAP(X_SPACE) "hp");
+                  break;
+                case GTD:
+                  SEND_STRING(SS_TAP(X_SPACE) "td" );
+                  SEND_STRING(SS_TAP(X_SPACE) "tw" );
+                  break;
+                case GDT:
+                  SEND_STRING(SS_TAP(X_SPACE) "hd");
+                  break;
+                case GBL:
+                  SEND_STRING(SS_TAP(X_SPACE) "hb");
+                  break;
                 default:
                   break;
             }
@@ -703,6 +741,27 @@ void vs_finished(tap_dance_state_t *state, void *user_data) {
                 case YC:
                   SEND_STRING("\"*y");
                   break;
+                case GSH:
+                  SEND_STRING(SS_TAP(X_SPACE) "hS");
+                  break;
+                case GRH:
+                  SEND_STRING(SS_TAP(X_SPACE) "hR");
+                  break;
+                case GPV:
+                  SEND_STRING(SS_TAP(X_SPACE) "hi");
+                  break;
+                case GTD:
+                  SEND_STRING(SS_TAP(X_SPACE) "td" );
+                  SEND_STRING(SS_TAP(X_SPACE) "tw" );
+                  break;
+                case GDT:
+                  SEND_STRING(SS_LCTL("w") "h");
+                  SEND_STRING(SS_TAP(X_SPACE) "q");
+                  SEND_STRING(SS_LCTL("w") "e");
+                  break;
+                case GBL:
+                  SEND_STRING(SS_TAP(X_SPACE) "hB");
+                  break;
                 default:
                   break;
             }
@@ -711,6 +770,9 @@ void vs_finished(tap_dance_state_t *state, void *user_data) {
             switch (tap_keycode->keycode) {
                 case YC:
                   SEND_STRING("\"ap");
+                  break;
+                case GTD:
+                  SEND_STRING(SS_TAP(X_SPACE) "tw" );
                   break;
                 default:
                   break;
@@ -795,6 +857,12 @@ tap_dance_action_t tap_dance_actions[] = {
     // For vim shortcuts:
     [TD_FF] = ACTION_TAP_DANCE_FN_VIM_SHORTCUT(FF),
     [TD_YC] = ACTION_TAP_DANCE_FN_VIM_SHORTCUT(YC),
+    [TD_GSH] = ACTION_TAP_DANCE_FN_VIM_SHORTCUT(GSH),
+    [TD_GRH] = ACTION_TAP_DANCE_FN_VIM_SHORTCUT(GRH),
+    [TD_GPV] = ACTION_TAP_DANCE_FN_VIM_SHORTCUT(GPV),
+    [TD_GTD] = ACTION_TAP_DANCE_FN_VIM_SHORTCUT(GTD),
+    [TD_GDT] = ACTION_TAP_DANCE_FN_VIM_SHORTCUT(GDT),
+    [TD_GBL] = ACTION_TAP_DANCE_FN_VIM_SHORTCUT(GBL),
 
 };
 // --- End Tap dances ---
@@ -864,9 +932,34 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 SEND_STRING(SS_LCTL("w") "u");
             }
             break;
+        case SS_WSR:
+            if(record->event.pressed){
+                SEND_STRING(SS_LCTL("w") "e");
+            }
+            break;
         case SS_GG:
             if(record->event.pressed){
                 SEND_STRING("gg");
+            }
+            break;
+        case SS_GUS:
+            if(record->event.pressed){
+                SEND_STRING(SS_TAP(X_SPACE) "hu");
+            }
+            break;
+        case SS_QR:
+            if(record->event.pressed){
+                SEND_STRING(SS_TAP(X_SPACE) "q" SS_LCTL("w") "e");
+            }
+            break;
+        case SS_GNH:
+            if(record->event.pressed){
+                SEND_STRING("]c");
+            }
+            break;
+        case SS_GPH:
+            if(record->event.pressed){
+                SEND_STRING("[c");
             }
             break;
         // -- For tap dances 'tap-hold':
@@ -906,7 +999,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 printf("SS_WD: %d\n", SS_WD);
                 printf("SS_WSU: %d\n", SS_WSU);
                 printf("SS_WSD: %d\n", SS_WSD);
+                printf("SS_WSR: %d\n", SS_WSR);
                 printf("SS_GG: %d\n", SS_GG);
+                printf("SS_GUS: %d\n", SS_GUS);
+                printf("SS_QR: %d\n", SS_QR);
+                printf("SS_GNH: %d\n", SS_GNH);
+                printf("SS_GPH: %d\n", SS_GPH);
                 printf("V_ESC: %d\n", V_ESC);
                 printf("A_ESC: %d\n", A_ESC);
                 printf("CLN: %d\n", CLN);
@@ -940,6 +1038,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 printf("ZZ: %d\n", ZZ);
                 printf("FF: %d\n", FF);
                 printf("YC: %d\n", YC);
+                printf("GSH: %d\n", GSH);
+                printf("GRH: %d\n", GRH);
+                printf("GPV: %d\n", GPV);
+                printf("GTD: %d\n", GTD);
+                printf("GDT: %d\n", GDT);
+                printf("GBL: %d\n", GBL);
                 printf("SMTD_KEYCODES_BEGIN: %d\n", SMTD_KEYCODES_BEGIN);
                 printf("CKC_A: %d\n", CKC_A);
                 printf("CKC_S: %d\n", CKC_S);
@@ -1006,6 +1110,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 printf("TD_ZZ: %d\n", TD_ZZ);
                 printf("TD_FF: %d\n", TD_FF);
                 printf("TD_YC: %d\n", TD_YC);
+                printf("TD_GSH: %d\n", TD_GSH);
+                printf("TD_GRH: %d\n", TD_GRH);
+                printf("TD_GPV: %d\n", TD_GPV);
+                printf("TD_GTD: %d\n", TD_GTD);
+                printf("TD_GDT: %d\n", TD_GDT);
+                printf("TD_GBL: %d\n", TD_GBL);
                 printf("-----------------------------\n");
                 printf("QK_TAP_DANCE: %d\n", QK_TAP_DANCE);
                 printf("QK_TAP_DANCE_MAX: %d\n", QK_TAP_DANCE_MAX);
@@ -1058,15 +1168,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   // Arrows layer (Left thumb1)
   [LARROW] = LAYOUT_split_3x6_3_ex2(
-  //,---------------------------------------------------------------------.  ,---------------------------------------------------------------------------.
-      XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX,        YC, DF(LVIMMOV),   XXXXXXX,     XXXXXXX, XXXXXXX, XXXXXXX,
-  //|--------+-----------+--------+--------+------------+--------+--------|  |----------+----------+-----------+----------+------------+--------+--------|
-      _______, CKC_VIMNAV,   CKC_2,      FF, CKC_ENT_GUI, XXXXXXX, XXXXXXX,      XXXXXXX,   KC_LEFT,   CKC_DOWN,    CKC_UP,   CKC_RIGHT, CKC_ENT, XXXXXXX,
-  //|--------+-----------+--------+--------+------------+--------+--------'  `----------+----------+-----------+----------+------------+--------+--------|
-   CKC_SPACE3,    XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX, XXXXXXX,                          XXXXXXX,  DF(LWIN1),   XXXXXXX,     XXXXXXX, XXXXXXX, KC_TILD,
-  //|--------+-----------+--------+--------+------------+--------+--------.  ,----------+----------+-----------+----------+------------+--------+--------|
-                                                 XXXXXXX, XXXXXXX, _______,   CKC_SPACE3,   KC_BSPC,    XXXXXXX
-                                      //`---------------------------------'  `---------------------------------'
+  //,-------------------------------------------------------------------------.  ,----------------------------------------------------------------------------.
+      XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX,     XXXXXXX, XXXXXXX,      XXXXXXX,        YC, DF(LVIMMOV),   XXXXXXX,     XXXXXXX, XXXXXXX, XXXXXXX,
+  //|--------+-----------+--------+--------+------------+------------+--------|  |----------+----------+------------+----------+------------+--------+--------|
+      _______, CKC_VIMNAV,   CKC_2,      FF, CKC_ENT_GUI, DF(LVIMGIT), XXXXXXX,      XXXXXXX,   KC_LEFT,    CKC_DOWN,    CKC_UP,   CKC_RIGHT, CKC_ENT, XXXXXXX,
+  //|--------+-----------+--------+--------+------------+------------+--------'  `----------+----------+------------+----------+------------+--------+--------|
+   CKC_SPACE3,    XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX,     XXXXXXX,                          XXXXXXX,   DF(LWIN1),   XXXXXXX,     XXXXXXX, XXXXXXX, KC_TILD,
+  //|--------+-----------+--------+--------+------------+------------+--------.  ,----------+----------+------------+----------+------------+--------+--------|
+                                                 XXXXXXX,     XXXXXXX, _______,   CKC_SPACE3,   KC_BSPC,    XXXXXXX
+                                      //`-------------------------------------'  `---------------------------------'
   ),
 
   // Boot, flash and led layer (two thumbs1)
@@ -1108,7 +1218,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // Vim motions
   [LVIMNAV] = LAYOUT_split_3x6_3_ex2(
   //,--------------------------------------------------------------.  ,---------------------------------------------------------------------------.
-      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX,   XXXXXXX,     SS_WSU,    SS_WSD,    XXXXXXX, XXXXXXX, XXXXXXX,
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX,    SS_WSR,     SS_WSU,    SS_WSD,    XXXXXXX, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------|  |----------+----------+-----------+----------+------------+--------+--------|
       XXXXXXX, _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX,     SS_WL,        SD1,       SU1,       SS_WR, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------'  `----------+----------+-----------+----------+------------+--------+--------|
@@ -1128,6 +1238,18 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------+--------.  ,--------+--------+--------+--------+--------+--------+--------|
                                           XXXXXXX, XXXXXXX, DF(LBASE),    _______, XXXXXXX, XXXXXXX
                                       //`--------------------------'  `--------------------------'
+  ),
+  // Vim Git actions
+  [LVIMGIT] = LAYOUT_split_3x6_3_ex2(
+  //,----------------------------------------------------------------.  ,--------------------------------------------------------------.
+      XXXXXXX,   SS_QR,     GTD, XXXXXXX,     GRH, XXXXXXX,   XXXXXXX,    XXXXXXX, XXXXXXX,  SS_GUS, XXXXXXX, XXXXXXX,     GPV, XXXXXXX,
+  //|--------+--------+--------+--------+--------+--------+----------|  |--------+--------+--------+--------+--------+--------+--------|
+      XXXXXXX, XXXXXXX,     GSH,     GDT, XXXXXXX, XXXXXXX,   XXXXXXX,    XXXXXXX, XXXXXXX,  SS_GNH,  SS_GPH, XXXXXXX, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------+--------+--------+--------+----------'  `--------+--------+--------+--------+--------+--------+--------|
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,     GBL,                        XXXXXXX,    KC_J,    KC_K, XXXXXXX, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------+--------+--------+--------+----------.  ,--------+--------+--------+--------+--------+--------+--------|
+                                          XXXXXXX, XXXXXXX, DF(LBASE),    _______, XXXXXXX, XXXXXXX
+                                      //`----------------------------'  `--------------------------'
   )
   // Template layer (to copy past)
   /*[x] = LAYOUT_split_3x6_3_ex2(
@@ -1243,6 +1365,12 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
           case WRS9:
           case SD1:
           case SU1:
+          case GSH:
+          case GRH:
+          case GPV:
+          case GTD:
+          case GDT:
+          case GBL:
               return 120;
         default:
             return TAPPING_TERM;
