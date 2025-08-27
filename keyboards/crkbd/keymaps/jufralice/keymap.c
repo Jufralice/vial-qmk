@@ -769,7 +769,7 @@ void vs_finished(tap_dance_state_t *state, void *user_data) {
                   SEND_STRING(SS_TAP(X_SPACE) "hB");
                   break;
                 case GC:
-                  SEND_STRING(SS_TAP(X_SPACE) "gc");
+                  SEND_STRING(SS_TAP(X_SPACE) "gcc");
                   SEND_STRING(SS_TAP(X_ESC));
                   break;
                 default:
