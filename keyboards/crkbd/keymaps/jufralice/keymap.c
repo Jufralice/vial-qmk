@@ -1394,15 +1394,17 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
 // --- For sm_td ---
 uint32_t get_smtd_timeout(uint16_t keycode, smtd_timeout timeout) {
     switch (keycode) {
-        case CKC_A:
         case CKC_S:
         case CKC_D:
         case CKC_F:
         case CKC_J:
         case CKC_K:
         case CKC_L:
-        case CKC_UNDS:
             if (timeout == SMTD_TIMEOUT_RELEASE) return 1;
+            break;
+        case CKC_A:
+        case CKC_UNDS:
+            if (timeout == SMTD_TIMEOUT_RELEASE) return 50;
             break;
         case CKC_1:
         case CKC_2:
