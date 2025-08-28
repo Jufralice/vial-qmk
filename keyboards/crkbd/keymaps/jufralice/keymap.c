@@ -758,7 +758,6 @@ void vs_finished(tap_dance_state_t *state, void *user_data) {
                   break;
                 case GTD:
                   SEND_STRING(SS_TAP(X_SPACE) "td" );
-                  SEND_STRING(SS_TAP(X_SPACE) "tw" );
                   break;
                 case GDT:
                   SEND_STRING(SS_LCTL("w") "h");
