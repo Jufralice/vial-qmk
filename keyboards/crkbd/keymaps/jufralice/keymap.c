@@ -29,6 +29,8 @@
 #define LVIMNAV 6
 #define LVIMGIT 7
 #define LVIMMOV 8
+#define LGAME 9
+#define LMOUSE 10
 
 
 
@@ -140,7 +142,8 @@ enum custom_keycodes {
     CKC_SPACE3,
     CKC_ENTER3,
     CKC_TAB,
-    CKC_VIMNAV,
+    CKC_ESC,
+    CKC_VIMGIT,
     SMTD_KEYCODES_END,
     DBG_ENUM, // Add a keycode to trigger debug print
 };
@@ -222,8 +225,9 @@ void on_smtd_action(uint16_t keycode, smtd_action action, uint8_t tap_count) {
         SMTD_LT(CKC_ENTER, KC_ENT, LARROW, 2)
         SMTD_LT(CKC_SPACE3, KC_SPACE, LBOOT, 2)
         SMTD_LT(CKC_ENTER3, KC_ENT, LBOOT, 2)
-        SMTD_LT(CKC_TAB, KC_TAB, LPART, 2)
-        SMTD_LT(CKC_VIMNAV, KC_A, LVIMNAV, 2)
+        SMTD_LT(CKC_TAB, KC_TAB, LMOUSE, 2)
+        SMTD_LT(CKC_ESC, KC_ESC, LVIMNAV, 2)
+        SMTD_LT(CKC_VIMGIT, KC_ESC, LVIMGIT, 2)
     }
 }
 // --- end sm_td ---
@@ -1083,7 +1087,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 printf("CKC_SPACE3: %d\n", CKC_SPACE3);
                 printf("CKC_ENTER3: %d\n", CKC_ENTER3);
                 printf("CKC_TAB: %d\n", CKC_TAB);
-                printf("CKC_VIMNAV: %d\n", CKC_VIMNAV);
+                printf("CKC_ESC: %d\n", CKC_ESC);
+                printf("CKC_VIMGIT: %d\n", CKC_VIMGIT);
                 printf("SMTD_KEYCODES_END: %d\n", SMTD_KEYCODES_END);
                 printf("DBG_ENUM: %d\n", DBG_ENUM);
                 printf("-----------------------------\n");
@@ -1157,11 +1162,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //,------------------------------------------------------------------------.  -------------------------------------------------------------------------------.
         XXXXXXX,     KC_Q,     KC_W,     KC_E,        KC_R,     KC_T, XXXXXXX,     XXXXXXX,     KC_Y,     KC_U,       KC_I,       KC_O,        KC_P,     XXXXXXX,
   //|---------+---------+---------+---------+------------+---------+---------|  |---------+---------+---------+-----------+-----------+------------+------------|
-        KC_ESC,    CKC_A,    CKC_S,    CKC_D,       CKC_F,     KC_G,  XXXXXXX,     XXXXXXX,     KC_H,    CKC_J,      CKC_K,      CKC_L,    CKC_UNDS,        QUOT,
+       CKC_ESC,    CKC_A,    CKC_S,    CKC_D,       CKC_F,     KC_G,  XXXXXXX,     XXXXXXX,     KC_H,    CKC_J,      CKC_K,      CKC_L,    CKC_UNDS,        QUOT,
   //|---------+---------+---------+---------+------------+---------+---------'  `---------+---------+---------+-----------+-----------+------------+------------|
         KC_GRV,     KC_Z,     KC_X,     KC_C,     V_ESC,       KC_B,                            KC_N,     KC_M,        COM,        DOT,        COLN,     XXXXXXX,
   //|---------+---------+---------+---------+------------+---------+---------.  ,---------+---------+---------+-----------+-----------+------------+------------|
-                                                  XXXXXXX,  CKC_TAB,CKC_ENTER,   CKC_SPACE,  KC_BSPC, XXXXXXX
+                                                MO(LPART),  CKC_TAB,CKC_ENTER,   CKC_SPACE,  KC_BSPC, XXXXXXX
                                                //`---------------------------'  `----------------------------'
 
   ),
@@ -1180,64 +1185,64 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   // Arrows layer (Left thumb1)
   [LARROW] = LAYOUT_split_3x6_3_ex2(
-  //,----------------------------------------------------------------------------.  ,----------------------------------------------------------------------------.
-         XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX,     XXXXXXX, XXXXXXX,      XXXXXXX,        YC, DF(LVIMMOV),   XXXXXXX,     XXXXXXX, XXXXXXX, XXXXXXX,
-  //|-----------+-----------+--------+--------+------------+------------+--------|  |----------+----------+------------+----------+------------+--------+--------|
-     MO(LVIMGIT), CKC_VIMNAV,   CKC_2,      FF, CKC_ENT_GUI, DF(LVIMGIT), XXXXXXX,      XXXXXXX,   KC_LEFT,    CKC_DOWN,    CKC_UP,   CKC_RIGHT, CKC_ENT, XXXXXXX,
-  //|-----------+-----------+--------+--------+------------+------------+--------'  `----------+----------+------------+----------+------------+--------+--------|
-      CKC_SPACE3,    XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX,     XXXXXXX,                          XXXXXXX,   DF(LWIN1),   XXXXXXX,     XXXXXXX, XXXXXXX, KC_TILD,
-  //|-----------+-----------+--------+--------+------------+------------+--------.  ,----------+----------+------------+----------+------------+--------+--------|
-                                                    XXXXXXX,     XXXXXXX, _______,   CKC_SPACE3,   KC_BSPC,    XXXXXXX
-                                      //`----------------------------------------'  `---------------------------------'
+  //,------------------------------------------------------------------------------.  ,----------------------------------------------------------------------------.
+         XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX,     XXXXXXX,   XXXXXXX,      XXXXXXX,        YC, DF(LVIMMOV),   XXXXXXX,     XXXXXXX, XXXXXXX, XXXXXXX,
+  //|-----------+-----------+--------+--------+------------+------------+----------|  |----------+----------+------------+----------+------------+--------+--------|
+      CKC_VIMGIT,      CKC_1,   CKC_2,      FF, CKC_ENT_GUI, DF(LVIMGIT), DF(LGAME),      XXXXXXX,   KC_LEFT,    CKC_DOWN,    CKC_UP,   CKC_RIGHT, CKC_ENT, XXXXXXX,
+  //|-----------+-----------+--------+--------+------------+------------+----------'  `----------+----------+------------+----------+------------+--------+--------|
+      CKC_SPACE3,    XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX,     XXXXXXX,                            XXXXXXX,   DF(LWIN1),   XXXXXXX,     XXXXXXX, XXXXXXX, KC_TILD,
+  //|-----------+-----------+--------+--------+------------+------------+----------.  ,----------+----------+------------+----------+------------+--------+--------|
+                                                    XXXXXXX,     XXXXXXX,   _______,   CKC_SPACE3,   KC_BSPC,    XXXXXXX
+                                      //`------------------------------------------'  `---------------------------------'
   ),
 
   // Boot, flash and led layer (two thumbs1)
   [LBOOT] = LAYOUT_split_3x6_3_ex2(
-  //,--------------------------------------------------------------.  ,--------------------------------------------------------------.
-      QK_BOOT, DBG_ENUM, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, DT_PRNT, QK_BOOT,
-  //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-      RGB_TOG, RGB_HUI, RGB_SAI, RGB_VAI, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, DT_UP, RGB_TOG,
-  //|--------+--------+--------+--------+--------+--------+--------'  `--------+--------+--------+--------+--------+--------+--------|
-      RGB_MOD, RGB_HUD, RGB_SAD, RGB_VAD, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, DT_DOWN, XXXXXXX,
-  //|--------+--------+--------+--------+--------+--------+--------.  ,--------+--------+--------+--------+--------+--------+--------|
-                                          KC_ESC, XXXXXXX, _______,    _______, KC_BSPC, KC_RGUI
-                                      //`--------------------------'  `--------------------------'
+  //,-----------------------------------------------------------------.  ,----------------------------------------------------------------.
+      QK_BOOT, DBG_ENUM, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX  , XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, DT_PRNT,   QK_BOOT,
+  //|--------+---------+--------+--------+--------+--------+----------|  |--------+--------+--------+--------+--------+--------+----------|
+      RGB_TOG,  RGB_HUI, RGB_SAI, RGB_VAI, XXXXXXX, XXXXXXX,   XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,   DT_UP,   RGB_TOG,
+  //|--------+---------+--------+--------+--------+--------+----------'  `--------+--------+--------+--------+--------+--------+----------|
+      RGB_MOD,  RGB_HUD, RGB_SAD, RGB_VAD, XXXXXXX, XXXXXXX,                        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, DT_DOWN,   XXXXXXX,
+  //|--------+---------+--------+--------+--------+--------+----------.  ,--------+--------+--------+--------+--------+--------+----------|
+                                            KC_ESC, XXXXXXX,   _______,    _______, KC_BSPC, KC_RGUI
+                                      //`-----------------------------'  `--------------------------'
   ),
   // Parentheses layer (left thumb2)
   [LPART] = LAYOUT_split_3x6_3_ex2(
   //,--------------------------------------------------------------.  ,----------------------------------------------------------------------.
-      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, LPRN,      KC_GRV, RPRN, XXXXXXX, XXXXXXX,
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX,        LPRN,      KC_GRV,    RPRN, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+------------+------------+--------+--------+--------|
-      XXXXXXX,   CKC_1, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX,     KC_LBRC, SLSH, KC_RBRC, XXXXXXX, XXXXXXX,
+      XXXXXXX,   CKC_1,   CKC_2,   CKC_3,   CKC_4, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX,     KC_LBRC,        SLSH, KC_RBRC, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------'  `--------+--------+------------+------------+--------+--------+--------|
-      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      AT, AMPR, DLR, CIRC, XXXXXXX, XXXXXXX,
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                           AT,        AMPR,         DLR,    CIRC, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------.  ,--------+--------+------------+------------+--------+--------+--------|
                                           XXXXXXX, _______, XXXXXXX,   KC_SPACE, KC_BSPC,     XXXXXXX
                                       //`--------------------------'  `------------------------------'
   ),
   // Window management layer (new base layer)
   [LWIN1] = LAYOUT_split_3x6_3_ex2(
-  //,-----------------------------------------------------------------------------------.  ,-----------------------------------------------------------------.
-      XXXXXXX, XXXXXXX,       XXXXXXX,    LCAG(KC_UP),          WND, XXXXXXX,    XXXXXXX,       XXXXXXX, XXXXXXX,    WRS1,    WRS2,    WRS3, XXXXXXX, XXXXXXX,
-  //|--------+--------+--------------+---------------+-------------+--------+-----------|  |-----------+--------+--------+--------+--------+--------+--------|
+  //,------------------------------------------------------------------------------------.  ,-----------------------------------------------------------------.
+      XXXXXXX, XXXXXXX,       XXXXXXX,    LCAG(KC_UP),           WND, XXXXXXX,    XXXXXXX,       XXXXXXX, XXXXXXX,    WRS1,    WRS2,    WRS3, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------------+---------------+--------------+--------+-----------|  |-----------+--------+--------+--------+--------+--------+--------|
       XXXXXXX, XXXXXXX, LCAG(KC_LEFT),  LCAG(KC_DOWN),LCAG(KC_RIGHT), XXXXXXX,    XXXXXXX,       XXXXXXX, XXXXXXX,    WRS4,    WRS5,    WRS6, XXXXXXX, XXXXXXX,
-  //|--------+--------+--------------+---------------+-------------+--------+-----------'  `-----------+--------+--------+--------+--------+--------+--------|
-      XXXXXXX, XXXXXXX,       XXXXXXX,      S(KC_TAB),      KC_TAB, XXXXXXX,                            XXXXXXX,    WRS7,    WRS8,    WRS9, XXXXXXX, XXXXXXX,
-  //|--------+--------+--------------+---------------+-------------+--------+-----------.  ,-----------+--------+--------+--------+--------+--------+--------|
-                                                          XXXXXXX,  XXXXXXX,  DF(LBASE),        CKC_STAB, XXXXXXX,  XXXXXXX
-                                                      //`-----------------------------'  `-----------------------------'
+  //|--------+--------+--------------+---------------+--------------+--------+-----------'  `-----------+--------+--------+--------+--------+--------+--------|
+      XXXXXXX, XXXXXXX,       XXXXXXX,      S(KC_TAB),        KC_TAB, XXXXXXX,                            XXXXXXX,    WRS7,    WRS8,    WRS9, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------------+---------------+--------------+--------+-----------.  ,-----------+--------+--------+--------+--------+--------+--------|
+                                                             XXXXXXX, XXXXXXX,  DF(LBASE),      CKC_STAB, XXXXXXX,  XXXXXXX
+                                                      //`--------------------------------'  `-----------------------------'
   ),
   // Vim motions
   [LVIMNAV] = LAYOUT_split_3x6_3_ex2(
-  //,--------------------------------------------------------------.  ,---------------------------------------------------------------------------.
-      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX,    SS_WSR,     SS_WSU,    SS_WSD,    XXXXXXX, XXXXXXX, XXXXXXX,
-  //|--------+--------+--------+--------+--------+--------+--------|  |----------+----------+-----------+----------+------------+--------+--------|
-      XXXXXXX, _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,      XXXXXXX,     SS_WL,        SD1,       SU1,       SS_WR, XXXXXXX, XXXXXXX,
-  //|--------+--------+--------+--------+--------+--------+--------'  `----------+----------+-----------+----------+------------+--------+--------|
-      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                          XXXXXXX,      SS_WD,     SS_WU,     XXXXXXX, XXXXXXX, XXXXXXX,
-  //|--------+--------+--------+--------+--------+--------+--------.  ,----------+----------+-----------+----------+------------+--------+--------|
-                                          XXXXXXX, XXXXXXX, _______,           ZZ,   XXXXXXX,    XXXXXXX
-                                      //`--------------------------'  `---------------------------------'
+  //,------------------------------------------------------------------.  ,---------------------------------------------------------------------------.
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX,      XXXXXXX,    SS_WSR,     SS_WSU,    SS_WSD,    XXXXXXX, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------+--------+--------+--------+------------|  |----------+----------+-----------+----------+------------+--------+--------|
+      XXXXXXX, _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX,      XXXXXXX,     SS_WL,        SD1,       SU1,       SS_WR, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------+--------+--------+--------+------------'  `----------+----------+-----------+----------+------------+--------+--------|
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                              XXXXXXX,      SS_WD,     SS_WU,     XXXXXXX, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------+--------+--------+--------+------------.  ,----------+----------+-----------+----------+------------+--------+--------|
+                                          XXXXXXX, XXXXXXX, MO(LVIMGIT),           ZZ,   XXXXXXX,    XXXXXXX
+                                      //`------------------------------'  `---------------------------------'
   ),
   // Vim movements
   [LVIMMOV] = LAYOUT_split_3x6_3_ex2(
@@ -1262,7 +1267,32 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------+----------.  ,--------+--------+--------+--------+--------+--------+--------|
                                           XXXXXXX, XXXXXXX, DF(LBASE),    _______, XXXXXXX, XXXXXXX
                                       //`----------------------------'  `--------------------------'
+  ),
+  // Game controls
+  [LGAME] = LAYOUT_split_3x6_3_ex2(
+  //,----------------------------------------------------------------.  ,--------------------------------------------------------------.
+      XXXXXXX,    KC_Q, KC_LSFT, KC_LCTL,    KC_R,    KC_T,   XXXXXXX,    XXXXXXX,    KC_Y,    KC_U,   KC_UP,    KC_O,    KC_P,    KC_I,
+  //|--------+--------+--------+--------+--------+--------+----------|  |--------+--------+--------+--------+--------+--------+--------|
+       KC_ESC,    KC_A,    KC_S,    KC_D,    KC_F,    KC_G, DF(LBASE),    XXXXXXX,    KC_H, KC_LEFT, KC_DOWN,KC_RIGHT,  KC_UNDS,   QUOT,
+  //|--------+--------+--------+--------+--------+--------+----------'  `--------+--------+--------+--------+--------+--------+--------|
+       KC_GRV,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                           KC_N,    KC_M,     COM,     DOT,    COLN, XXXXXXX,
+  //|--------+--------+--------+--------+--------+--------+----------.  ,--------+--------+--------+--------+--------+--------+--------|
+                                          XXXXXXX,  KC_TAB,    KC_ENT,   KC_SPACE, KC_BSPC, XXXXXXX
+                                      //`----------------------------'  `--------------------------'
+  ),
+  // mouse controls
+  [LMOUSE] = LAYOUT_split_3x6_3_ex2(
+  //,--------------------------------------------------------------.  ,--------------------------------------------------------------.
+      XXXXXXX, XXXXXXX, MS_WHLR, MS_WHLU, MS_WHLD, MS_WHLL, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX,   MS_UP, XXXXXXX, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
+      XXXXXXX, XXXXXXX, MS_ACL0, MS_ACL1, MS_ACL2, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, MS_LEFT, MS_DOWN, MS_RGHT, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------+--------+--------+--------+--------'  `--------+--------+--------+--------+--------+--------+--------|
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, MS_ACL0, MS_ACL1, MS_ACL2, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------+--------+--------+--------+--------.  ,--------+--------+--------+--------+--------+--------+--------|
+                                          _______, XXXXXXX, XXXXXXX,    MS_BTN1, MS_BTN2, MS_BTN3
+                                      //`--------------------------'  `--------------------------'
   )
+
   // Template layer (to copy past)
   /*[x] = LAYOUT_split_3x6_3_ex2(
   //,--------------------------------------------------------------.  ,--------------------------------------------------------------.
@@ -1360,7 +1390,6 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
           case LPRN:
           case LBRC:
           case RPRN:
-          case ZZ:
           case FF:
               return 100;
           case QUOT:
@@ -1385,6 +1414,8 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
           case GBL:
           case GC:
               return 120;
+          case ZZ:
+              return 150;
         default:
             return TAPPING_TERM;
     }
@@ -1404,7 +1435,7 @@ uint32_t get_smtd_timeout(uint16_t keycode, smtd_timeout timeout) {
             break;
         case CKC_A:
         case CKC_UNDS:
-            if (timeout == SMTD_TIMEOUT_RELEASE) return 50;
+            if (timeout == SMTD_TIMEOUT_RELEASE) return 10;
             break;
         case CKC_1:
         case CKC_2:
@@ -1418,10 +1449,11 @@ uint32_t get_smtd_timeout(uint16_t keycode, smtd_timeout timeout) {
             break;
         case CKC_TAB:
         case CKC_ENTER:
-        case CKC_VIMNAV:
+        case CKC_VIMGIT:
             if (timeout == SMTD_TIMEOUT_TAP) return 100;
             if (timeout == SMTD_TIMEOUT_FOLLOWING_TAP) return 10;
             break;
+        case CKC_ESC:
         case CKC_SPACE:
             if (timeout == SMTD_TIMEOUT_TAP) return 150;
             if (timeout == SMTD_TIMEOUT_FOLLOWING_TAP) return 100;

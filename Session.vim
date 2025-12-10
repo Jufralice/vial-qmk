@@ -17,18 +17,19 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +1 Session.vim
-badd +780 keyboards/crkbd/keymaps/jufralice/keymap.c
+badd +2 keyboards/crkbd/keymaps/jufralice/keymap.c
 argglobal
 %argdel
-$argadd keyboards/crkbd/keymaps/jufralice/keymap.c
 edit keyboards/crkbd/keymaps/jufralice/keymap.c
 let s:save_splitbelow = &splitbelow
 let s:save_splitright = &splitright
 set splitbelow splitright
 wincmd _ | wincmd |
 vsplit
-1wincmd h
+wincmd _ | wincmd |
+vsplit
+2wincmd h
+wincmd w
 wincmd w
 let &splitbelow = s:save_splitbelow
 let &splitright = s:save_splitright
@@ -41,16 +42,16 @@ set winminwidth=0
 set winwidth=1
 wincmd =
 argglobal
-balt Session.vim
-setlocal fdm=indent
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=1000
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-let s:l = 1 - ((0 * winheight(0) + 36) / 72)
+balt keyboards/crkbd/keymaps/jufralice/keymap.c
+setlocal foldmethod=indent
+setlocal foldexpr=0
+setlocal foldmarker={{{,}}}
+setlocal foldignore=#
+setlocal foldlevel=1000
+setlocal foldminlines=1
+setlocal foldnestmax=20
+setlocal foldenable
+let s:l = 1 - ((0 * winheight(0) + 38) / 77)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
@@ -62,75 +63,42 @@ if bufexists(fnamemodify("keyboards/crkbd/keymaps/jufralice/keymap.c", ":p")) | 
 if &buftype ==# 'terminal'
   silent file keyboards/crkbd/keymaps/jufralice/keymap.c
 endif
-balt Session.vim
-setlocal fdm=indent
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=1000
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-680
-normal! zo
-689
-normal! zo
-731
-normal! zo
-832
-normal! zo
-832
-normal! zo
-832
-normal! zo
-832
-normal! zo
-832
-normal! zo
-832
-normal! zo
-832
-normal! zo
-832
-normal! zo
-832
-normal! zo
-832
-normal! zo
-832
-normal! zo
-832
-normal! zo
-832
-normal! zo
-868
-normal! zo
-868
-normal! zo
-868
-normal! zo
-868
-normal! zo
-868
-normal! zo
-868
-normal! zo
-868
-normal! zo
-868
-normal! zo
-868
-normal! zo
-953
-normal! zo
-954
-normal! zo
-let s:l = 806 - ((36 * winheight(0) + 36) / 72)
+balt keyboards/crkbd/keymaps/jufralice/keymap.c
+setlocal foldmethod=indent
+setlocal foldexpr=0
+setlocal foldmarker={{{,}}}
+setlocal foldignore=#
+setlocal foldlevel=1000
+setlocal foldminlines=1
+setlocal foldnestmax=20
+setlocal foldenable
+let s:l = 2 - ((1 * winheight(0) + 38) / 77)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 806
-normal! 07|
+keepjumps 2
+normal! 0
+wincmd w
+argglobal
+if bufexists(fnamemodify("keyboards/crkbd/keymaps/jufralice/keymap.c", ":p")) | buffer keyboards/crkbd/keymaps/jufralice/keymap.c | else | edit keyboards/crkbd/keymaps/jufralice/keymap.c | endif
+if &buftype ==# 'terminal'
+  silent file keyboards/crkbd/keymaps/jufralice/keymap.c
+endif
+balt keyboards/crkbd/keymaps/jufralice/keymap.c
+setlocal foldmethod=indent
+setlocal foldexpr=0
+setlocal foldmarker={{{,}}}
+setlocal foldignore=#
+setlocal foldlevel=1000
+setlocal foldminlines=1
+setlocal foldnestmax=20
+setlocal foldenable
+let s:l = 1 - ((0 * winheight(0) + 38) / 77)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 1
+normal! 0
 wincmd w
 2wincmd w
 wincmd =
