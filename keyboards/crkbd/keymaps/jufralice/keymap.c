@@ -1199,11 +1199,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // Boot, flash and led layer (two thumbs1)
   [LBOOT] = LAYOUT_split_3x6_3_ex2(
   //,-----------------------------------------------------------------.  ,----------------------------------------------------------------.
-      QK_BOOT, DBG_ENUM, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX  , XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, DT_PRNT,   QK_BOOT,
+      QK_BOOT, DBG_ENUM, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX  , XXXXXXX,    XXXXXXX, XXXXXXX, KC_BRID, KC_BRIU, XXXXXXX, DT_PRNT,   QK_BOOT,
   //|--------+---------+--------+--------+--------+--------+----------|  |--------+--------+--------+--------+--------+--------+----------|
-      RGB_TOG,  RGB_HUI, RGB_SAI, RGB_VAI, XXXXXXX, XXXXXXX,   XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,   DT_UP,   RGB_TOG,
+      RGB_TOG,  RGB_HUI, RGB_SAI, RGB_VAI, XXXXXXX, XXXXXXX,   XXXXXXX,    XXXXXXX, KC_MUTE, KC_VOLD, KC_VOLU, KC_MPLY,   DT_UP,   RGB_TOG,
   //|--------+---------+--------+--------+--------+--------+----------'  `--------+--------+--------+--------+--------+--------+----------|
-      RGB_MOD,  RGB_HUD, RGB_SAD, RGB_VAD, XXXXXXX, XXXXXXX,                        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, DT_DOWN,   XXXXXXX,
+      RGB_MOD,  RGB_HUD, RGB_SAD, RGB_VAD, XXXXXXX, XXXXXXX,                        XXXXXXX, KC_MPRV, KC_MNXT, XXXXXXX, DT_DOWN,   XXXXXXX,
   //|--------+---------+--------+--------+--------+--------+----------.  ,--------+--------+--------+--------+--------+--------+----------|
                                             KC_ESC, XXXXXXX,   _______,    _______, KC_BSPC, KC_RGUI
                                       //`-----------------------------'  `--------------------------'
