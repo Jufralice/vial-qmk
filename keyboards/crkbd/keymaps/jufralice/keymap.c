@@ -1018,7 +1018,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             break;
         case SS_SA:
             if(record->event.pressed){
-                SEND_STRING("gg");
+                SEND_STRING("_");
             }
             break;
         case SS_GUS:
@@ -1254,15 +1254,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   // Arrows layer (Left thumb1)
   [LARROW] = LAYOUT_split_3x6_3_ex2(
-  //,------------------------------------------------------------------------------.  ,----------------------------------------------------------------------------.
-         XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX,     XXXXXXX,   XXXXXXX,      XXXXXXX,        YC, DF(LVIMMOV),   XXXXXXX,     XXXXXXX, XXXXXXX, XXXXXXX,
-  //|-----------+-----------+--------+--------+------------+------------+----------|  |----------+----------+------------+----------+------------+--------+--------|
-      CKC_VIMGIT,      CKC_1,   CKC_2,      FF, CKC_ENT_GUI, DF(LVIMGIT), DF(LGAME),      XXXXXXX,   KC_LEFT,    CKC_DOWN,    CKC_UP,   CKC_RIGHT, CKC_ENT, XXXXXXX,
-  //|-----------+-----------+--------+--------+------------+------------+----------'  `----------+----------+------------+----------+------------+--------+--------|
-      CKC_SPACE3,    XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX,     XXXXXXX,                            XXXXXXX,   DF(LWIN1),   XXXXXXX,     XXXXXXX, XXXXXXX, KC_TILD,
-  //|-----------+-----------+--------+--------+------------+------------+----------.  ,----------+----------+------------+----------+------------+--------+--------|
-                                                    XXXXXXX,     XXXXXXX,   _______,   CKC_SPACE3,   KC_BSPC,    XXXXXXX
-                                      //`------------------------------------------'  `---------------------------------'
+  //,-----------------------------------------------------------------------------------.  ,----------------------------------------------------------------------------.
+         XXXXXXX,    XXXXXXX, XXXXXXX, MO(LVIMGIT),     XXXXXXX,     XXXXXXX,   XXXXXXX,      XXXXXXX,        YC, DF(LVIMMOV),   XXXXXXX,     XXXXXXX, XXXXXXX, XXXXXXX,
+  //|-----------+-----------+--------+------------+------------+------------+----------|  |----------+----------+------------+----------+------------+--------+--------|
+      CKC_VIMGIT,      CKC_1,   CKC_2,          FF, CKC_ENT_GUI, DF(LVIMGIT), DF(LGAME),      XXXXXXX,   KC_LEFT,    CKC_DOWN,    CKC_UP,   CKC_RIGHT, CKC_ENT, XXXXXXX,
+  //|-----------+-----------+--------+------------+------------+------------+----------'  `----------+----------+------------+----------+------------+--------+--------|
+      CKC_SPACE3,    XXXXXXX, XXXXXXX,    XXXXXXX,      XXXXXXX,     XXXXXXX,                            XXXXXXX,   DF(LWIN1),   XXXXXXX,     XXXXXXX, XXXXXXX, KC_TILD,
+  //|-----------+-----------+--------+------------+------------+------------+----------.  ,----------+----------+------------+----------+------------+--------+--------|
+                                                        XXXXXXX,     XXXXXXX,   _______,   CKC_SPACE3,   KC_BSPC,    XXXXXXX
+                                      //`----------------------------------------------'  `---------------------------------'
   ),
 
   // Boot, flash and led layer (two thumbs1)
