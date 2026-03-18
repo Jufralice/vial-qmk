@@ -59,6 +59,7 @@ enum tap_dances {
     TD_QUOT,
     TD_COLN,
     TD_SLSH,
+    TD_ACC,
     TD_LPRN,
     TD_RPRN,
     TD_LBRC,
@@ -107,6 +108,7 @@ enum custom_keycodes {
     SS_WSD, //Window size decrease
     SS_WSR, //Window size reset
     SS_GG, //GG for move line number
+    SS_SA, //Save vim buffer
     SS_GUS, //Git undo stage hunk
     SS_QR, //Quit(close) current window and resize
     SS_GNH, //Git next hunk
@@ -118,6 +120,7 @@ enum custom_keycodes {
     CKC_A, // reads as C(ustom) + KC_A, but you may give any name here
     CKC_S,
     CKC_D,
+    CKC_E,
     CKC_F,
     CKC_J,
     CKC_K,
@@ -157,6 +160,7 @@ enum tapdances_keycodes {
     QUOT = TD(TD_QUOT),
     COLN = TD(TD_COLN),
     SLSH = TD(TD_SLSH),
+    ACC = TD(TD_ACC),
     LPRN = TD(TD_LPRN),
     RPRN = TD(TD_RPRN),
     LBRC = TD(TD_LBRC),
@@ -227,6 +231,7 @@ void on_smtd_action(uint16_t keycode, smtd_action action, uint8_t tap_count) {
         SMTD_LT(CKC_ENTER3, KC_ENT, LBOOT, 2)
         SMTD_LT(CKC_TAB, KC_TAB, LMOUSE, 2)
         SMTD_LT(CKC_ESC, KC_ESC, LVIMNAV, 2)
+        SMTD_LT(CKC_E, KC_E, LVIMNAV, 2)
         SMTD_LT(CKC_VIMGIT, KC_ESC, LVIMGIT, 2)
     }
 }
@@ -269,6 +274,10 @@ void rprn_reset(tap_dance_state_t *state, void *user_data);
 // for the slashes tap dance. put it here so it can be used in any keymap
 void slsh_finished(tap_dance_state_t *state, void *user_data);
 void slsh_reset(tap_dance_state_t *state, void *user_data);
+
+// for the accent tap dance. put it here so it can be used in any keymap
+void acc_finished(tap_dance_state_t *state, void *user_data);
+void acc_reset(tap_dance_state_t *state, void *user_data);
 
 // for the window management tap dance. put it here so it can be used in any keymap
 void wm_finished(tap_dance_state_t *state, void *user_data);
@@ -539,6 +548,56 @@ void slsh_reset(tap_dance_state_t *state, void *user_data) {
         case TD_DOUBLE_TAP: unregister_code16(KC_PIPE); break;
         case TD_DOUBLE_HOLD: unregister_code16(KC_PIPE); break;
         case TD_DOUBLE_SINGLE_TAP: unregister_code16(KC_PIPE); break;
+        default: break;
+    }
+    slsh_state.state = TD_NONE;
+}
+
+void acc_finished(tap_dance_state_t *state, void *user_data) {
+    slsh_state.state = cur_dance(state);
+    switch (slsh_state.state) {
+        case TD_SINGLE_TAP:
+          register_code(KC_LALT);
+          tap_code(KC_E);
+          unregister_code(KC_LALT);
+          register_code(KC_E);
+          break;
+        case TD_SINGLE_HOLD:
+          register_code(KC_LALT);
+          tap_code(KC_GRV);
+          unregister_code(KC_LALT);
+          register_code(KC_E);
+          break;
+        case TD_DOUBLE_TAP:
+          register_code(KC_LALT);
+          register_code(KC_GRV);
+          break;
+        case TD_DOUBLE_HOLD:
+        case TD_DOUBLE_SINGLE_TAP:
+          register_code(KC_LALT);
+          register_code(KC_E);
+          break;
+        default: break;
+    }
+}
+
+void acc_reset(tap_dance_state_t *state, void *user_data) {
+    switch (slsh_state.state) {
+        case TD_SINGLE_TAP:
+          unregister_code(KC_E);
+          break;
+        case TD_SINGLE_HOLD:
+          unregister_code(KC_E);
+          break;
+        case TD_DOUBLE_TAP:
+          unregister_code(KC_GRV);
+          unregister_code(KC_LALT);
+          break;
+        case TD_DOUBLE_HOLD:
+        case TD_DOUBLE_SINGLE_TAP:
+          unregister_code(KC_E);
+          unregister_code(KC_LALT);
+          break;
         default: break;
     }
     slsh_state.state = TD_NONE;
@@ -842,7 +901,7 @@ tap_dance_action_t tap_dance_actions[] = {
     [TD_LPRN] = ACTION_TAP_DANCE_TAP_HOLD(KC_LPRN, KC_LCBR),
     [TD_RPRN] = ACTION_TAP_DANCE_TAP_HOLD(KC_RPRN, KC_RCBR),
     [TD_LBRC] = ACTION_TAP_DANCE_TAP_HOLD(KC_LBRC, KC_RBRC),
-    [TD_AMPR] = ACTION_TAP_DANCE_TAP_HOLD(KC_AMPR, KC_PIPE),
+    [TD_AMPR] = ACTION_TAP_DANCE_TAP_HOLD(KC_PIPE, KC_AMPR),
     [TD_DLR] = ACTION_TAP_DANCE_TAP_HOLD(KC_DLR, KC_PERC),
     [TD_AT] = ACTION_TAP_DANCE_TAP_HOLD(KC_HASH, KC_AT),
     [TD_CIRC] = ACTION_TAP_DANCE_TAP_HOLD(KC_CIRC, KC_TILD),
@@ -851,6 +910,7 @@ tap_dance_action_t tap_dance_actions[] = {
     // [TD_LPRN] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, lprn_finished, lprn_reset),
     // [TD_RPRN] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, rprn_finished, rprn_reset),
     [TD_SLSH] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, slsh_finished, slsh_reset),
+    [TD_ACC] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, acc_finished, acc_reset),
     // For window managements:
     [TD_WRS1] = ACTION_TAP_DANCE_FN_WINDOW_MANAGEMENT(WRS1),
     [TD_WRS2] = ACTION_TAP_DANCE_FN_WINDOW_MANAGEMENT(WRS2),
@@ -956,6 +1016,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 SEND_STRING("gg");
             }
             break;
+        case SS_SA:
+            if(record->event.pressed){
+                SEND_STRING("gg");
+            }
+            break;
         case SS_GUS:
             if(record->event.pressed){
                 SEND_STRING(SS_TAP(X_SPACE) "hu");
@@ -1015,6 +1080,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 printf("SS_WSD: %d\n", SS_WSD);
                 printf("SS_WSR: %d\n", SS_WSR);
                 printf("SS_GG: %d\n", SS_GG);
+                printf("SS_SA: %d\n", SS_SA);
                 printf("SS_GUS: %d\n", SS_GUS);
                 printf("SS_QR: %d\n", SS_QR);
                 printf("SS_GNH: %d\n", SS_GNH);
@@ -1027,6 +1093,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 printf("QUOT: %d\n", QUOT);
                 printf("COLN: %d\n", COLN);
                 printf("SLSH: %d\n", SLSH);
+                printf("ACC: %d\n", ACC);
                 printf("LPRN: %d\n", LPRN);
                 printf("RPRN: %d\n", RPRN);
                 printf("LBRC: %d\n", LBRC);
@@ -1088,6 +1155,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 printf("CKC_ENTER3: %d\n", CKC_ENTER3);
                 printf("CKC_TAB: %d\n", CKC_TAB);
                 printf("CKC_ESC: %d\n", CKC_ESC);
+                printf("CKC_E: %d\n", CKC_E);
                 printf("CKC_VIMGIT: %d\n", CKC_VIMGIT);
                 printf("SMTD_KEYCODES_END: %d\n", SMTD_KEYCODES_END);
                 printf("DBG_ENUM: %d\n", DBG_ENUM);
@@ -1101,6 +1169,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 printf("TD_QUOT: %d\n", TD_QUOT);
                 printf("TD_COLN: %d\n", TD_COLN);
                 printf("TD_SLSH: %d\n", TD_SLSH);
+                printf("TD_ACC: %d\n", TD_ACC);
                 printf("TD_LPRN: %d\n", TD_LPRN);
                 printf("TD_RPRN: %d\n", TD_RPRN);
                 printf("TD_LBRC: %d\n", TD_LBRC);
@@ -1160,11 +1229,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // Main layer
   [LBASE] = LAYOUT_split_3x6_3_ex2(
   //,------------------------------------------------------------------------.  -------------------------------------------------------------------------------.
-        XXXXXXX,     KC_Q,     KC_W,     KC_E,        KC_R,     KC_T, XXXXXXX,     XXXXXXX,     KC_Y,     KC_U,       KC_I,       KC_O,        KC_P,     XXXXXXX,
+        KC_DEL,     KC_Q,     KC_W,    CKC_E,        KC_R,     KC_T, XXXXXXX,     XXXXXXX,     KC_Y,     KC_U,       KC_I,       KC_O,        KC_P,     KC_PGUP,
   //|---------+---------+---------+---------+------------+---------+---------|  |---------+---------+---------+-----------+-----------+------------+------------|
        CKC_ESC,    CKC_A,    CKC_S,    CKC_D,       CKC_F,     KC_G,  XXXXXXX,     XXXXXXX,     KC_H,    CKC_J,      CKC_K,      CKC_L,    CKC_UNDS,        QUOT,
   //|---------+---------+---------+---------+------------+---------+---------'  `---------+---------+---------+-----------+-----------+------------+------------|
-        KC_GRV,     KC_Z,     KC_X,     KC_C,     V_ESC,       KC_B,                            KC_N,     KC_M,        COM,        DOT,        COLN,     XXXXXXX,
+        KC_GRV,     KC_Z,     KC_X,     KC_C,     V_ESC,       KC_B,                            KC_N,     KC_M,        COM,        DOT,        COLN,     KC_PGDN,
   //|---------+---------+---------+---------+------------+---------+---------.  ,---------+---------+---------+-----------+-----------+------------+------------|
                                                 MO(LPART),  CKC_TAB,CKC_ENTER,   CKC_SPACE,  KC_BSPC, XXXXXXX
                                                //`---------------------------'  `----------------------------'
@@ -1211,7 +1280,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // Parentheses layer (left thumb2)
   [LPART] = LAYOUT_split_3x6_3_ex2(
   //,--------------------------------------------------------------.  ,----------------------------------------------------------------------.
-      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX,        LPRN,      KC_GRV,    RPRN, XXXXXXX, XXXXXXX,
+      XXXXXXX, XXXXXXX, XXXXXXX,     ACC, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX,        LPRN,      KC_GRV,    RPRN, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+------------+------------+--------+--------+--------|
       XXXXXXX,   CKC_1,   CKC_2,   CKC_3,   CKC_4, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX,     KC_LBRC,        SLSH, KC_RBRC, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------'  `--------+--------+------------+------------+--------+--------+--------|
@@ -1234,13 +1303,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
   // Vim motions
   [LVIMNAV] = LAYOUT_split_3x6_3_ex2(
-  //,------------------------------------------------------------------.  ,---------------------------------------------------------------------------.
-      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX,      XXXXXXX,    SS_WSR,     SS_WSU,    SS_WSD,    XXXXXXX, XXXXXXX, XXXXXXX,
-  //|--------+--------+--------+--------+--------+--------+------------|  |----------+----------+-----------+----------+------------+--------+--------|
-      XXXXXXX, _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,     XXXXXXX,      XXXXXXX,     SS_WL,        SD1,       SU1,       SS_WR, XXXXXXX, XXXXXXX,
-  //|--------+--------+--------+--------+--------+--------+------------'  `----------+----------+-----------+----------+------------+--------+--------|
-      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                              XXXXXXX,      SS_WD,     SS_WU,     XXXXXXX, XXXXXXX, XXXXXXX,
-  //|--------+--------+--------+--------+--------+--------+------------.  ,----------+----------+-----------+----------+------------+--------+--------|
+  //,------------------------------------------------------------------.  ,--------------------------------------------------------------------------.
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, LCTL(KC_U), XXXXXXX,  XXXXXXX,      XXXXXXX,    SS_WSR,     SS_WSU,    SS_WSD,    XXXXXXX, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------+--------+-----------+--------+---------|  |----------+----------+-----------+----------+-----------+--------+--------|
+      XXXXXXX, _______, XXXXXXX, XXXXXXX, LCTL(KC_D), XXXXXXX,  XXXXXXX,      XXXXXXX,     SS_WL, LCTL(KC_E),LCTL(KC_Y),      SS_WR,   SS_SA, XXXXXXX,
+  //|--------+--------+--------+--------+-----------+--------+---------'  `----------+----------+-----------+----------+-----------+--------+--------|
+      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX,                           XXXXXXX,      SS_WD,     SS_WU,    XXXXXXX, XXXXXXX, XXXXXXX,
+  //|--------+--------+--------+--------+-----------+--------+---------.  ,----------+----------+-----------+----------+-----------+--------+--------|
                                           XXXXXXX, XXXXXXX, MO(LVIMGIT),           ZZ,   XXXXXXX,    XXXXXXX
                                       //`------------------------------'  `---------------------------------'
   ),
@@ -1271,13 +1340,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   // Game controls
   [LGAME] = LAYOUT_split_3x6_3_ex2(
   //,----------------------------------------------------------------.  ,--------------------------------------------------------------.
-      XXXXXXX,    KC_Q, KC_LSFT, KC_LCTL,    KC_R,    KC_T,   XXXXXXX,    XXXXXXX,    KC_Y,    KC_U,   KC_UP,    KC_O,    KC_P,    KC_I,
+      XXXXXXX,    KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,   XXXXXXX,    KC_LSFT,    KC_Y,    KC_U,   KC_UP,    KC_O,    KC_P,    KC_I,
   //|--------+--------+--------+--------+--------+--------+----------|  |--------+--------+--------+--------+--------+--------+--------|
-       KC_ESC,    KC_A,    KC_S,    KC_D,    KC_F,    KC_G, DF(LBASE),    XXXXXXX,    KC_H, KC_LEFT, KC_DOWN,KC_RIGHT,  KC_UNDS,   QUOT,
+       KC_ESC,    KC_A,    KC_S,    KC_D,    KC_F,    KC_G, DF(LBASE),    KC_LCTL,    KC_H, KC_LEFT, KC_DOWN,KC_RIGHT, KC_PLUS, KC_MINS,
   //|--------+--------+--------+--------+--------+--------+----------'  `--------+--------+--------+--------+--------+--------+--------|
-       KC_GRV,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                           KC_N,    KC_M,     COM,     DOT,    COLN, XXXXXXX,
+       KC_GRV,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                           KC_N,    KC_M, KC_COMM,  KC_DOT, KC_LBRC, KC_RBRC,
   //|--------+--------+--------+--------+--------+--------+----------.  ,--------+--------+--------+--------+--------+--------+--------|
-                                          XXXXXXX,  KC_TAB,    KC_ENT,   KC_SPACE, KC_BSPC, XXXXXXX
+                                          KC_TAB,MO(LMOUSE),    KC_ENT,   KC_SPACE, KC_BSPC, MO(LNUM)
                                       //`----------------------------'  `--------------------------'
   ),
   // mouse controls
@@ -1395,6 +1464,7 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
           case QUOT:
           /* case COLN: */
           case SLSH:
+          case ACC:
           case WRS1:
           case WRS2:
           case WRS3:
@@ -1427,6 +1497,7 @@ uint32_t get_smtd_timeout(uint16_t keycode, smtd_timeout timeout) {
     switch (keycode) {
         case CKC_S:
         case CKC_D:
+        case CKC_E:
         case CKC_F:
         case CKC_J:
         case CKC_K:
